@@ -1,0 +1,10 @@
+<p-toolbar class="!bg-transparent">
+  <ng-template #start>
+  </ng-template>
+  <ng-template #end>
+    <div class="flex gap-1">
+      <app-add-button (clicked)="createRequested.emit()"/>
+      <app-refresh-button [loading]="store.isProcessing()" (clicked)="store.load()"/>
+    </div>
+  </ng-template>
+</p-toolbar>

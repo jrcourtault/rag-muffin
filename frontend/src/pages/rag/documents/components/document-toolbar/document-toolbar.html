@@ -1,0 +1,24 @@
+<p-toolbar class="!bg-transparent">
+  <ng-template #start>
+    <div class="hidden md:flex gap-2">
+      <input pInputText type="text" [placeholder]="'documents.filter.name' | transloco"
+             (input)="onFilterName($event)" class="p-inputtext-sm"/>
+      <p-select [options]="extensionOptions" [placeholder]="'documents.filter.extension' | transloco"
+                [showClear]="true" (onChange)="onFilterExtension($event.value)" class="w-40"/>
+      <p-select [options]="statusOptions" [placeholder]="'documents.filter.status' | transloco"
+                optionValue="value" optionLabel="i18n"
+                [showClear]="true" (onChange)="onFilterStatus($event.value)" class="w-40">
+        <ng-template #selectedItem let-opt>{{ opt.i18n | transloco }}</ng-template>
+        <ng-template #item let-opt>{{ opt.i18n | transloco }}</ng-template>
+      </p-select>
+    </div>
+  </ng-template>
+  <ng-template #end>
+    <div class="flex gap-1">
+      @if (!security.isViewer()) {
+        <app-add-button (clicked)="createRequested.emit()"/>
+      }
+      <app-refresh-button [loading]="store.isProcessing()" (clicked)="store.loadPage()"/>
+    </div>
+  </ng-template>
+</p-toolbar>

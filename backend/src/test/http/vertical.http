@@ -1,0 +1,39 @@
+### Lister les verticales
+GET {{api_url}}/api/verticals
+Authorization: Bearer {{access_token}}
+
+### Créer une verticale
+POST {{api_url}}/api/verticals
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+{
+  "name": "Juridique",
+  "defaultChunkSize": 512,
+  "defaultChunkOverlap": 77,
+  "defaultPrefetchSize": 20,
+  "defaultRerank": true,
+  "defaultTopK": 5,
+  "queryRewritePrompt": "Reformule la question suivante pour la rendre plus précise et adaptée à une recherche dans des documents juridiques.",
+  "systemPrompt": "Tu es un assistant juridique. Réponds uniquement à partir des documents fournis. Cite tes sources."
+}
+
+### Modifier une verticale
+PUT {{api_url}}/api/verticals/aaaaaaaa-0000-0000-0000-000000000001
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+{
+  "name": "Juridique Modifié",
+  "defaultChunkSize": 256,
+  "defaultChunkOverlap": 50,
+  "defaultPrefetchSize": 10,
+  "defaultRerank": false,
+  "defaultTopK": 3,
+  "queryRewritePrompt": "Nouveau prompt de reformulation.",
+  "systemPrompt": "Nouveau prompt système."
+}
+
+### Supprimer une verticale
+DELETE {{api_url}}/api/verticals/aaaaaaaa-0000-0000-0000-000000000001
+Authorization: Bearer {{access_token}}

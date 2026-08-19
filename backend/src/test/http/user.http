@@ -1,0 +1,45 @@
+### Get current user in a workspace
+GET {{api_url}}/api/workspaces/a1b2c3d4-e5f6-7890-abcd-ef1234567890/users/me
+Authorization: Bearer {{access_token}}
+
+### Create a user in a workspace
+POST {{api_url}}/api/workspaces/a1b2c3d4-e5f6-7890-abcd-ef1234567890/users
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+{"email": "marie.dupont@example.com", "langue": "fr", "role": "EDITOR", "firstName": "Marie", "lastName": "Dupont"}
+
+### List users of a workspace
+GET {{api_url}}/api/workspaces/a1b2c3d4-e5f6-7890-abcd-ef1234567890/users
+Authorization: Bearer {{access_token}}
+
+### List users filtered by email
+GET {{api_url}}/api/workspaces/a1b2c3d4-e5f6-7890-abcd-ef1234567890/users?email=marie
+Authorization: Bearer {{access_token}}
+
+### List users filtered by role
+GET {{api_url}}/api/workspaces/a1b2c3d4-e5f6-7890-abcd-ef1234567890/users?role=OWNER
+Authorization: Bearer {{access_token}}
+
+### List users filtered by name (matches firstName or lastName)
+GET {{api_url}}/api/workspaces/a1b2c3d4-e5f6-7890-abcd-ef1234567890/users?name=Martin
+Authorization: Bearer {{access_token}}
+
+### List users with combined filters
+GET {{api_url}}/api/workspaces/a1b2c3d4-e5f6-7890-abcd-ef1234567890/users?email=jean&role=OWNER
+Authorization: Bearer {{access_token}}
+
+### Get a single user
+GET {{api_url}}/api/workspaces/a1b2c3d4-e5f6-7890-abcd-ef1234567890/users/e5f6a7b8-c9d0-1234-efab-567890123456
+Authorization: Bearer {{access_token}}
+
+### Update a user
+PUT {{api_url}}/api/workspaces/a1b2c3d4-e5f6-7890-abcd-ef1234567890/users/e5f6a7b8-c9d0-1234-efab-567890123456
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+{"role": "EDITOR", "firstName": "Marie", "lastName": "Dupont-Martin"}
+
+### Delete a user from a workspace
+DELETE {{api_url}}/api/workspaces/a1b2c3d4-e5f6-7890-abcd-ef1234567890/users/e5f6a7b8-c9d0-1234-efab-567890123456
+Authorization: Bearer {{access_token}}

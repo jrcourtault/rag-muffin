@@ -1,0 +1,14 @@
+### Lire la config LLM du workspace
+GET {{api_url}}/api/workspaces/a1b2c3d4-e5f6-7890-abcd-ef1234567890/llm-config
+Authorization: Bearer {{access_token}}
+
+### Modifier la config LLM du workspace
+PUT {{api_url}}/api/workspaces/a1b2c3d4-e5f6-7890-abcd-ef1234567890/llm-config
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+{
+  "baseUrl": "https://api.mistral.ai/v1",
+  "apiKey": "your-mistral-api-key",
+  "model": "mistral-small-latest"
+}

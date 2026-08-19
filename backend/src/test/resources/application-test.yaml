@@ -1,0 +1,18 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show_sql: true
+
+app:
+  qdrant:
+    host: unused
+    port: 0
+    api-key: unused
+    collection-name: unused
+  reranker:
+    base-url: unused
+  default-llm-config:
+    base-url: http://localhost:12434/engines/v1
+    api-key: MY-EMPTY-KEY
+    model: llama3.2:16k

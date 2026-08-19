@@ -1,0 +1,22 @@
+<p-toolbar class="!bg-transparent">
+  <ng-template #start>
+    <div class="hidden md:flex gap-2">
+      <input pInputText type="text" [placeholder]="'users.filter.email' | transloco"
+             (input)="onFilterEmail($event)" class="p-inputtext-sm"/>
+      <input pInputText type="text" [placeholder]="'users.filter.name' | transloco"
+             (input)="onFilterName($event)" class="p-inputtext-sm"/>
+      <p-select [options]="roleOptions" [placeholder]="'users.filter.role' | transloco"
+                optionValue="value" optionLabel="i18n"
+                [showClear]="true" (onChange)="onFilterRole($event.value)" class="w-40">
+        <ng-template #selectedItem let-opt>{{ opt.i18n | transloco }}</ng-template>
+        <ng-template #item let-opt>{{ opt.i18n | transloco }}</ng-template>
+      </p-select>
+    </div>
+  </ng-template>
+  <ng-template #end>
+    <div class="flex gap-1">
+      <app-add-button (clicked)="createRequested.emit()"/>
+      <app-refresh-button [loading]="store.isProcessing()" (clicked)="store.loadPage()"/>
+    </div>
+  </ng-template>
+</p-toolbar>

@@ -1,0 +1,69 @@
+<p-drawer
+  [header]="(isEdit() ? 'common.modifyTitle' : 'common.createTitle') | transloco"
+  [visible]="visible()"
+  [modal]="true"
+  position="bottom"
+  [style]="{ height: 'auto', maxHeight: '80vh' }"
+  (onHide)="close()">
+
+  @if (loading()) {
+    <app-spinner/>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="onSave()" class="flex flex-col gap-4 max-w-2xl mx-auto">
+
+      <div class="flex flex-col sm:flex-row gap-4">
+        <div class="flex flex-col gap-1 flex-1">
+          <label for="user-email">{{ 'form.email' | transloco }}</label>
+          <input pInputText id="user-email" formControlName="email" type="email"/>
+        </div>
+
+        <div class="flex flex-col gap-1 flex-1">
+          <label for="user-role">{{ 'form.role' | transloco }}</label>
+          <p-select id="user-role"
+                    formControlName="role"
+                    [options]="roles"
+                    optionValue="value"
+                    optionLabel="i18n"
+                    appendTo="body">
+            <ng-template #selectedItem let-opt>{{ opt.i18n | transloco }}</ng-template>
+            <ng-template #item let-opt>{{ opt.i18n | transloco }}</ng-template>
+          </p-select>
+        </div>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-4">
+        <div class="flex flex-col gap-1 flex-1">
+          <label for="user-firstName">{{ 'form.firstName' | transloco }}</label>
+          <input pInputText id="user-firstName" formControlName="firstName"/>
+        </div>
+
+        <div class="flex flex-col gap-1 flex-1">
+          <label for="user-lastName">{{ 'form.lastName' | transloco }}</label>
+          <input pInputText id="user-lastName" formControlName="lastName"/>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-1 w-48">
+        <label for="user-langue">{{ 'form.langue' | transloco }}</label>
+        <p-select id="user-langue"
+                  formControlName="langue"
+                  [options]="langues"
+                  optionValue="value"
+                  optionLabel="i18n"
+                  appendTo="body">
+          <ng-template #selectedItem let-opt>{{ opt.i18n | transloco }}</ng-template>
+          <ng-template #item let-opt>{{ opt.i18n | transloco }}</ng-template>
+        </p-select>
+      </div>
+
+      <div class="flex justify-end gap-2">
+        <p-button [label]="'common.cancel' | transloco" severity="secondary" [text]="true" (onClick)="close()"
+                  [disabled]="store.isProcessing()"/>
+        <p-button [label]="(isEdit() ? 'common.save' : 'common.create') | transloco" (onClick)="onSave()"
+                  [disabled]="!isValid() || store.isProcessing()" [loading]="store.isProcessing()"/>
+      </div>
+
+    </form>
+  }
+
+</p-drawer>

@@ -1,0 +1,55 @@
+<p-toolbar [dt]="{ root: { background: '#ffffff', borderColor: 'var(--p-content-border-color)' } }">
+
+  <ng-template #start>
+    <div class="flex items-center gap-1">
+      <p-button class="lg:hidden" icon="pi pi-bars" [rounded]="true" [text]="true" severity="secondary"
+                (onClick)="menuToggled.emit()"/>
+      <a [routerLink]="['/', PATHS.HOME]" class="text-xl font-bold no-underline text-surface-900 cursor-pointer">
+        Rag<span class="text-primary">Muffin</span>
+      </a>
+    </div>
+  </ng-template>
+
+  <ng-template #center>
+    <p-select
+      [options]="workspaceSelectionService.workspaces()"
+      [ngModel]="workspaceSelectionService.selected()"
+      (ngModelChange)="workspaceSelectionService.selected.set($event)"
+      optionLabel="name"
+      [placeholder]="'nav.workspaces' | transloco"
+      [emptyMessage]="'nav.noWorkspace' | transloco"
+      class="w-48"
+    />
+  </ng-template>
+
+  <ng-template #end>
+    <div class="flex items-center">
+      <div>
+        <p-button [rounded]="true" [text]="true" severity="secondary" (click)="langMenu.toggle($event)">
+          <span class="text-xl">{{ selectedLang().flag }}</span>
+        </p-button>
+        <p-popover #langMenu>
+          <div class="flex flex-col gap-0">
+            @for (lang of langs; track lang.code) {
+              <p-button [text]="true" severity="secondary" (click)="onLangChange(lang); langMenu.hide()">
+                <span class="text-xl">{{ lang.flag }}</span>
+              </p-button>
+            }
+          </div>
+        </p-popover>
+      </div>
+      <div>
+        <p-button icon="pi pi-user text-lg" [rounded]="true" [text]="true" severity="secondary"
+                  (click)="userMenu.toggle($event)"/>
+        <p-popover #userMenu>
+          <div class="flex flex-col gap-2">
+            <div class="text-sm text-surface-500">{{ authService.email }}</div>
+            <p-button [text]="true" severity="secondary" icon="pi pi-sign-out"
+                      [label]="'nav.logout' | transloco" (onClick)="authService.logout(); userMenu.hide()"/>
+          </div>
+        </p-popover>
+      </div>
+    </div>
+  </ng-template>
+
+</p-toolbar>

@@ -1,0 +1,11 @@
+<app-page-content title="nav.users">
+
+<app-user-toolbar
+  (createRequested)="onCreate()"/>
+
+<app-user-table
+  (editRequested)="onEdit($event)"/>
+
+<app-user-form/>
+
+</app-page-content>

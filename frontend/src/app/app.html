@@ -1,0 +1,9 @@
+<p-toast/>
+
+@if (workspaceSelectionService.isInitializing()) {
+  <div class="flex h-screen items-center justify-center">
+    <p-progressspinner/>
+  </div>
+} @else {
+  <app-template/>
+}

@@ -1,0 +1,127 @@
+name: RAG-Muffin
+
+services:
+
+  postgres:
+    container_name: postgres
+    image: postgres:18.2-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - ./volumes/postgres:/var/lib/postgresql
+    ports:
+      - '5432:5432'
+
+  embeddings: #Pour forcer le build du projet /embeddings : docker compose -f backend/docker-compose-dev.yml build embeddings --no-cache
+    # Pour repasser en CPU (Mac ou machine sans GPU NVIDIA) :
+    #   1. Dans embeddings/Dockerfile, remplacer "whl/cu***" par "whl/cpu"
+    #   2. Supprimer le bloc "deploy" ci-dessous
+    #   3. Rebuilder : docker compose -f backend/docker-compose-dev.yml build embeddings --no-cache
+    container_name: embeddings
+    build: ../embeddings
+    environment:
+      UVICORN_WORKERS: 1 # Nb instances de l'embeddings (géré par python)
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    volumes:
+      - ./volumes/embeddings:/data
+    ports:
+      - '8090:80'
+
+  reranker:
+    container_name: reranker
+    image: ghcr.io/huggingface/text-embeddings-inference:86-1.9
+    command: --model-id BAAI/bge-reranker-v2-m3
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    volumes:
+      - ./volumes/reranker:/data
+    ports:
+      - '8091:80'
+
+  artemis:
+    container_name: artemis
+    image: apache/activemq-artemis:2.44.0-alpine
+    environment:
+      ARTEMIS_USER: admin
+      ARTEMIS_PASSWORD: admin
+    volumes:
+      - ./volumes/artemis:/var/lib/artemis-instance/data
+    ports:
+      - '61616:61616'
+      - '8161:8161'
+
+  qdrant:
+    container_name: qdrant
+    image: qdrant/qdrant:v1.17.0
+    environment:
+      QDRANT__SERVICE__API_KEY: rag-muffin
+    volumes:
+      - ./volumes/qdrant:/qdrant/storage
+    ports:
+      - '6333:6333'
+      - '6334:6334'
+
+  tika:
+    container_name: tika
+    image: apache/tika:3.3.0.0-full
+    ports:
+      - '9998:9998'
+
+  mailpit:
+    container_name: mailpit
+    image: axllent/mailpit:v1.29
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+
+  keycloak_db:
+    container_name: keycloak_db
+    image: postgres:18.2-alpine
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - ./volumes/postgres-keycloak:/var/lib/postgresql
+    ports:
+      - '5433:5432'
+
+  keycloak:
+    container_name: keycloak
+    image: quay.io/keycloak/keycloak:26.6.0
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloak_db/postgres
+      KC_DB_USERNAME: postgres
+      KC_DB_PASSWORD: postgres
+      KC_HOSTNAME: localhost
+      KC_HOSTNAME_PORT: 8081
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      ### DÉSACTIVER TOUS LES CACHES POUR QUE LES MODIFICATIONS DU TEMPLATE SOIENT VISIBLES ##
+      #KC_SPI_THEME_CACHE_THEMES: false
+      #KC_SPI_THEME_CACHE_TEMPLATES: false
+      #KC_SPI_THEME_STATIC_MAX_AGE: -1
+      #KC_CACHE: local
+      #KC_HTTP_RELATIVE_PATH: /
+    command: start --import-realm --spi-connections-jpa-default-migration-strategy=update --http-enabled=true --proxy-headers=xforwarded
+    volumes:
+      - ../keycloak/realm-export-dev.json:/opt/keycloak/data/import/realm.json
+    #  - ./trucs/keycloak/themes/rag-muffin:/opt/keycloak/themes/rag-muffin
+    ports:
+      - "8081:8080"
+    depends_on:
+      - keycloak_db

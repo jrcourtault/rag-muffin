@@ -1,0 +1,37 @@
+<app-page-content title="llmConfig.title">
+
+  @if (configResource.isLoading()) {
+    <app-spinner/>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="onSave()" class="flex flex-col gap-4">
+
+      <div class="flex flex-col gap-1">
+        <label for="llm-base-url">{{ 'llmConfig.baseUrl' | transloco }}</label>
+        <input pInputText id="llm-base-url" formControlName="baseUrl" placeholder="https://api.mistral.ai/v1"/>
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label for="llm-api-key">{{ 'llmConfig.apiKey' | transloco }}</label>
+        <div class="flex gap-2">
+          <input pInputText id="llm-api-key" formControlName="apiKey" class="flex-1"
+                 [placeholder]="apiKeyConfigured() ? ('llmConfig.apiKeyPlaceholder' | transloco) : ''"/>
+        </div>
+        @if (apiKeyConfigured()) {
+          <small class="text-primary">{{ 'llmConfig.apiKeyHint' | transloco }}</small>
+        }
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label for="llm-model">{{ 'llmConfig.model' | transloco }}</label>
+        <input pInputText id="llm-model" formControlName="model" placeholder="mistral-small-latest"/>
+      </div>
+
+      <div class="flex justify-center mt-4">
+        <p-button [label]="'common.save' | transloco" (onClick)="onSave()"
+                  [disabled]="form.invalid || saving()" [loading]="saving()"/>
+      </div>
+
+    </form>
+  }
+
+</app-page-content>

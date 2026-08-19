@@ -1,0 +1,73 @@
+### Créer un workspace
+POST {{api_url}}/api/workspaces
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+{
+  "createWorkspaceRequest": {
+    "name": "Club Parachutisme Bordeaux",
+    "vertical": "GENERIC",
+    "active": true,
+    "chunkSize": 512,
+    "chunkOverlap": 77,
+    "prefetchSize": 20,
+    "rerank": false,
+    "topK": 10
+  },
+  "createOwnerRequest": {
+    "email": "jean@example.com",
+    "langue": "fr",
+    "firstName": "Jean",
+    "lastName": "Dupont"
+  }
+}
+
+### Lister tous les workspaces
+GET {{api_url}}/api/workspaces
+Authorization: Bearer {{access_token}}
+
+### Lister les workspaces filtrés par nom
+GET {{api_url}}/api/workspaces?name=Martin
+Authorization: Bearer {{access_token}}
+
+### Lister les workspaces filtrés par vertical
+GET {{api_url}}/api/workspaces?vertical=GENERIC
+Authorization: Bearer {{access_token}}
+
+### Lister les workspaces actifs
+GET {{api_url}}/api/workspaces?active=true
+Authorization: Bearer {{access_token}}
+
+### Lister avec plusieurs filtres combinés
+GET {{api_url}}/api/workspaces?name=Club&active=true&vertical=GENERIC
+Authorization: Bearer {{access_token}}
+
+### Lire un workspace par ID
+GET {{api_url}}/api/workspaces/4c40582f-0f28-49a6-80c5-d7ed05e680a3
+Authorization: Bearer {{access_token}}
+
+### Modifier un workspace
+PUT {{api_url}}/api/workspaces/1504a42f-d6d0-4a48-bf79-ccc4958221c2
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+{
+  "updateWorkspaceRequest": {
+    "name": "Club Para Bordeaux Renommé",
+    "verticalId": "00000000-0000-0000-0000-000000000001",
+    "active": false,
+    "prefetchSize": 20,
+    "rerank": false,
+    "topK": 10
+  },
+  "updateOwnerRequest": {
+    "email": "marie@example.com",
+    "langue": "fr",
+    "firstName": "Marie",
+    "lastName": "Martin"
+  }
+}
+
+### Supprimer un workspace
+DELETE {{api_url}}/api/workspaces/4c40582f-0f28-49a6-80c5-d7ed05e680a3
+Authorization: Bearer {{access_token}}

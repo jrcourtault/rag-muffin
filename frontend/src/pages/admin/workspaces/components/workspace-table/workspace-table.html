@@ -1,0 +1,52 @@
+<p-table [value]="store.items()"
+         [stripedRows]="true" [paginator]="true"
+         [lazy]="true" [totalRecords]="store.totalRecords()"
+         [rows]="defaultPageSize" [rowsPerPageOptions]="pageSizeOptions"
+         (onLazyLoad)="onLoadPage($event)">
+
+  <ng-template #header>
+    <tr>
+      <th pSortableColumn="name">{{ 'workspaces.table.name' | transloco }}
+        <p-sortIcon field="name"/>
+      </th>
+      <th class="w-48">{{ 'workspaces.table.vertical' | transloco }}</th>
+      <th pSortableColumn="active" class="w-32">{{ 'workspaces.table.active' | transloco }}
+        <p-sortIcon field="active"/>
+      </th>
+      <th class="w-24"></th>
+    </tr>
+  </ng-template>
+
+  <ng-template #body let-workspaceWithVertical>
+    <tr>
+      <td>{{ workspaceWithVertical.workspace.name }}</td>
+      <td>{{ workspaceWithVertical.vertical.name }}</td>
+      <td>
+        @if (workspaceWithVertical.workspace.active) {
+          <p-tag [value]="'workspaces.status.active' | transloco" severity="success"/>
+        } @else {
+          <p-tag [value]="'workspaces.status.inactive' | transloco" severity="danger"/>
+        }
+      </td>
+      <td>
+        <div class="flex gap-1">
+          <app-edit-button (clicked)="editRequested.emit(workspaceWithVertical.workspace)"/>
+          <app-delete-button [disabled]="workspaceWithVertical.workspace.active" (confirmed)="onDelete(workspaceWithVertical.workspace)"/>
+        </div>
+      </td>
+    </tr>
+  </ng-template>
+
+  <ng-template #emptymessage>
+    <tr>
+      <td colspan="4" class="text-center text-surface-400 py-8">
+        @if (store.isProcessing()) {
+          {{ 'common.loading' | transloco }}
+        } @else {
+          {{ 'workspaces.table.empty' | transloco }}
+        }
+      </td>
+    </tr>
+  </ng-template>
+
+</p-table>

@@ -1,0 +1,35 @@
+<div class="flex h-screen flex-col overflow-hidden">
+  @if (loadingService.loading()) {
+    <div class="fixed top-0 left-0 right-0 z-[9999]">
+      <p-progressbar mode="indeterminate" [style]="{ height: '3px' }" color="#000" />
+    </div>
+  }
+  <app-topbar (menuToggled)="toggleDrawer()"/>
+
+  <!-- Drawer mobile -->
+  <p-drawer
+    [(visible)]="drawerVisible"
+    [modal]="true"
+    position="left"
+    styleClass="w-64"
+  >
+    <ng-template #header>
+      <span class="text-lg font-bold">{{ 'nav.menu' | transloco }}</span>
+    </ng-template>
+    <app-sidebar-nav (linkClicked)="toggleDrawer()"/>
+  </p-drawer>
+
+  <!-- Sidebar desktop + contenu -->
+  <div class="flex min-h-0 flex-1">
+    <!-- Sidebar (desktop uniquement) -->
+    <div class="hidden w-48 border-r border-surface lg:block">
+      <app-sidebar-nav/>
+    </div>
+
+    <!-- Contenu -->
+    <main class="flex-1 overflow-auto p-4 bg-surface-50">
+      <app-breadcrumb-nav/>
+      <router-outlet/>
+    </main>
+  </div>
+</div>

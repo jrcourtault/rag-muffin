@@ -1,0 +1,58 @@
+<p-drawer
+  [header]="(isEdit() ? 'common.modifyTitle' : 'common.createTitle') | transloco"
+  [visible]="visible()"
+  [modal]="true"
+  position="bottom"
+  [style]="{ height: 'auto', maxHeight: '80vh' }"
+  (onHide)="close()">
+
+  @if (loading()) {
+    <app-spinner/>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="onSave()" class="flex flex-col gap-4 max-w-2xl mx-auto">
+
+      @if (isEdit()) {
+        <div class="flex flex-col gap-1">
+          <label for="document-name">{{ 'form.name' | transloco }}</label>
+          <input pInputText id="document-name" formControlName="name"/>
+        </div>
+      } @else {
+        <p-fileupload
+          #upload
+          mode="advanced"
+          [multiple]="true"
+          [customUpload]="true"
+          (uploadHandler)="onUpload($event, upload)"
+          [chooseLabel]="'common.add' | transloco"
+          [uploadLabel]="'common.send' | transloco"
+          [cancelLabel]="'common.cancel' | transloco"
+          [auto]="false"
+          [disabled]="store.isProcessing()"
+          [accept]="acceptedExtensions"
+          [maxFileSize]="maxFileSize"
+          chooseIcon="pi pi-plus"
+          [chooseButtonProps]="{ severity: 'contrast', disabled: store.isProcessing() }"
+          [uploadButtonProps]="{ severity: 'primary', disabled: store.isProcessing() }"
+          [cancelButtonProps]="{ severity: 'secondary', disabled: store.isProcessing() }">
+          <ng-template #empty>
+            <div class="flex flex-col items-center gap-2 py-4 text-surface-400">
+              <i class="pi pi-cloud-upload text-4xl"></i>
+              <span>{{ 'common.drop' | transloco }}</span>
+            </div>
+          </ng-template>
+        </p-fileupload>
+      }
+
+      @if (isEdit()) {
+        <div class="flex justify-end gap-2">
+          <p-button [label]="'common.cancel' | transloco" severity="secondary" [text]="true" (onClick)="close()"
+                    [disabled]="store.isProcessing()"/>
+          <p-button [label]="'common.save' | transloco" (onClick)="onSave()"
+                    [disabled]="!canSave() || store.isProcessing()" [loading]="store.isProcessing()"/>
+        </div>
+      }
+
+    </form>
+  }
+
+</p-drawer>

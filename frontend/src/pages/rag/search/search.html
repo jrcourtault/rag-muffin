@@ -1,0 +1,52 @@
+<app-page-content title="nav.search">
+
+<div class="flex mb-4">
+  <input
+    pInputText
+    class="flex-1"
+    [placeholder]="'search.placeholder' | transloco"
+    [ngModel]="query()"
+    (ngModelChange)="query.set($event)"
+    (keydown)="onKeydown($event)"
+    [disabled]="loading()"/>
+</div>
+
+<div class="flex items-center gap-2">
+  <p-toggleSwitch
+    inputId="search-query-rewriting"
+    [ngModel]="queryRewriting()"
+    (ngModelChange)="queryRewriting.set($event)"
+    [disabled]="loading()"/>
+  <label for="search-query-rewriting" class="text-sm text-surface-600 cursor-pointer">
+    {{ 'rag.queryRewriting' | transloco }}
+  </label>
+</div>
+
+@if (loading()) {
+  <app-spinner/>
+}
+
+@if (response(); as res) {
+  @if (res.rewrittenQuestion) {
+    <p class="text-sm text-surface-500 italic mb-4">
+      {{ 'rag.rewrittenQuestion' | transloco }} : {{ res.rewrittenQuestion }}
+    </p>
+  }
+
+  @if (res.chunks?.length === 0) {
+    <div class="text-center text-surface-500 py-8">
+      {{ 'search.noResults' | transloco }}
+    </div>
+  }
+
+  @if (res.chunks && res.chunks.length > 0) {
+    <app-subtitle title="search.results" class="mt-7 block"/>
+    <div class="flex flex-col gap-3">
+      @for (chunk of res.chunks; track $index) {
+        <app-chunk-card [chunk]="chunk" [index]="$index"/>
+      }
+    </div>
+  }
+}
+
+</app-page-content>

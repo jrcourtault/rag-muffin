@@ -1,0 +1,23 @@
+<nav class="flex flex-col p-2">
+  @for (group of menu(); track group.title; let last = $last) {
+    <span class="px-3 pb-1 text-xs font-semibold uppercase text-surface-400">
+      {{ group.title | transloco }}
+    </span>
+    <div class="flex flex-col gap-1">
+      @for (link of group.links; track link.path) {
+        <a
+          [routerLink]="['/', link.path]"
+          routerLinkActive="bg-primary/10 text-primary"
+          class="flex items-center gap-2 rounded-md px-3 py-2 hover:bg-surface-100"
+          (click)="clickMenu()"
+        >
+          <i [class]="link.icon"></i>
+          {{ link.label | transloco }}
+        </a>
+      }
+    </div>
+    @if (!last) {
+      <div class="border-t border-surface-200 my-3"></div>
+    }
+  }
+</nav>

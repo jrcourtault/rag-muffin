@@ -1,0 +1,76 @@
+<p-table [value]="store.items()"
+         [stripedRows]="true" [paginator]="true"
+         [lazy]="true" [totalRecords]="store.totalRecords()"
+         [rows]="defaultPageSize" [rowsPerPageOptions]="pageSizeOptions"
+         (onLazyLoad)="onLoadPage($event)">
+
+  <ng-template #header>
+    <tr>
+      <th pSortableColumn="name">{{ 'documents.table.name' | transloco }}
+        <p-sortIcon field="name"/>
+      </th>
+      <th pSortableColumn="extension">{{ 'documents.table.file' | transloco }}
+        <p-sortIcon field="extension"/>
+      </th>
+      <th pSortableColumn="status" class="w-32">{{ 'documents.table.status' | transloco }}
+        <p-sortIcon field="status"/>
+      </th>
+      <th pSortableColumn="sizeBytes" class="w-24">{{ 'documents.table.size' | transloco }}
+        <p-sortIcon field="sizeBytes"/>
+      </th>
+      <th pSortableColumn="chunkCount" class="w-32">{{ 'documents.table.chunks' | transloco }}
+        <p-sortIcon field="chunkCount"/>
+      </th>
+      <th pSortableColumn="createdAt" class="w-44">{{ 'documents.table.createdAt' | transloco }}
+        <p-sortIcon field="createdAt"/>
+      </th>
+      @if (!security.isViewer()) {
+        <th class="w-24"></th>
+      }
+    </tr>
+  </ng-template>
+
+  <ng-template #body let-doc>
+    <tr>
+      <td>{{ doc.name }}</td>
+      <td><a class="text-primary cursor-pointer hover:underline" (click)="onDownload(doc)">{{ doc.fileName }}</a></td>
+      <td>
+        @switch (doc.status) {
+          @case ('PENDING') {
+            <p-tag [value]="'enum.status.PENDING' | transloco" icon="pi pi-spin pi-spinner" severity="info"/>
+          }
+          @case ('INDEXED') {
+            <p-tag [value]="'enum.status.INDEXED' | transloco" severity="success"/>
+          }
+          @case ('ERROR') {
+            <p-tag [value]="'enum.status.ERROR' | transloco" severity="danger"/>
+          }
+        }
+      </td>
+      <td>{{ doc.sizeBytes | fileSize }}</td>
+      <td>{{ doc.chunkCount ?? '—' }}</td>
+      <td>{{ doc.createdAt | translocoDate: { dateStyle: 'short', timeStyle: 'short' } }}</td>
+      @if (!security.isViewer()) {
+        <td>
+          <div class="flex gap-1">
+            <app-edit-button (clicked)="editRequested.emit(doc)"/>
+            <app-delete-button [disabled]="doc.status === 'PENDING'" (confirmed)="onDelete(doc)"/>
+          </div>
+        </td>
+      }
+    </tr>
+  </ng-template>
+
+  <ng-template #emptymessage>
+    <tr>
+      <td colspan="7" class="text-center text-surface-400 py-8">
+        @if (store.isProcessing()) {
+          {{ 'common.loading' | transloco }}
+        } @else {
+          {{ 'documents.table.empty' | transloco }}
+        }
+      </td>
+    </tr>
+  </ng-template>
+
+</p-table>

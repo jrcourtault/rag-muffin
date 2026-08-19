@@ -1,0 +1,24 @@
+/* You can add global styles to this file, and also import other style files */
+
+@use "tailwindcss";
+@use "primeicons/primeicons.css";
+
+@plugin "tailwindcss-primeui";
+
+@layer tailwind, primeng;
+
+/* Couleur unie sur le spinner */
+.custom-spinner .p-progressspinner-circle {
+  stroke: var(--p-primary-color) !important;
+}
+
+.custom-spinner svg {
+  width: 50px !important;
+  height: 50px !important;
+}
+
+/* Masquer le thumbnail et le badge "Pending" du composant FileUpload PrimeNG */
+.p-fileupload-file-thumbnail,
+.p-fileupload-file-badge {
+  display: none !important;
+}

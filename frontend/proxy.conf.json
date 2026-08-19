@@ -1,0 +1,9 @@
+{
+  "//": "En dev, ng serve tourne sur :4200 et le backend Spring Boot sur :8080",
+  "///": "Ce proxy redirige /api/* vers le backend pour éviter les erreurs CORS",
+
+  "/api": {
+    "target": "http://localhost:8080",
+    "secure": false
+  }
+}

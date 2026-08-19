@@ -1,0 +1,37 @@
+### Poser une question (RAG complet : recherche + LLM)
+POST {{api_url}}/api/workspaces/bee30625-693f-4f54-b81e-01677981fbb7/rag/ask
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+{
+  "question": "Quel brevet pour sauter d'un ballon ?"
+}
+
+### Poser une question avec query rewriting activé
+POST {{api_url}}/api/workspaces/bee30625-693f-4f54-b81e-01677981fbb7/rag/ask
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+{
+  "question": "c'est quoi le truc pour sauter en tandem ?",
+  "queryRewriting": true
+}
+
+### Recherche seule (pas d'appel LLM, texte complet)
+POST {{api_url}}/api/workspaces/bee30625-693f-4f54-b81e-01677981fbb7/rag/search
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+{
+  "question": "Quel brevet faut il pour un saut de ballon ?"
+}
+
+### Recherche avec query rewriting activé
+POST {{api_url}}/api/workspaces/bee30625-693f-4f54-b81e-01677981fbb7/rag/search
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+{
+  "question": "c'est quoi le truc pour sauter en tandem ?",
+  "queryRewriting": true
+}

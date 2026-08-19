@@ -1,0 +1,21 @@
+<div class="bg-surface-50 rounded-lg p-4">
+  <div class="flex items-center gap-2 mb-2">
+    <i class="pi pi-file"></i>
+    <span class="font-semibold">{{ chunk().fileName }}</span>
+    <p-button icon="pi pi-download" [rounded]="true" [text]="true" severity="primary" size="small"
+              (onClick)="download()"/>
+    <div class="ml-auto flex items-center gap-2">
+      <p-tag class="ms-2" [value]="'Chunk #' + chunk().chunkIndex" severity="secondary"/>
+      @if (chunk().score != null) {
+        <p-tag [value]="formatScore(chunk().score)" severity="success"/>
+      }
+    </div>
+  </div>
+  <p-panel
+    [header]="'common.showChunk' | transloco"
+    [toggleable]="true"
+    [collapsed]="true"
+    class="mt-2">
+    <p class="text-sm text-surface-700 whitespace-pre-line leading-relaxed">[...] {{ chunk().text }} [...]</p>
+  </p-panel>
+</div>

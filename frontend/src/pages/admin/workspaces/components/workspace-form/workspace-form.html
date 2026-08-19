@@ -1,0 +1,116 @@
+<p-drawer
+  [header]="(isEdit() ? 'common.modifyTitle' : 'common.createTitle') | transloco"
+  [visible]="visible()"
+  [modal]="true"
+  position="bottom"
+  [style]="{ height: 'auto', maxHeight: '80vh' }"
+  (onHide)="close()">
+
+  @if (loading()) {
+    <app-spinner/>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="onSave()" class="flex flex-col gap-4 max-w-2xl mx-auto">
+
+      <app-form-section-title>{{ 'form.section.workspace' | transloco }}</app-form-section-title>
+
+      <div class="flex flex-col sm:flex-row gap-4">
+        <div class="flex flex-col gap-1 flex-1">
+          <label for="workspace-name">{{ 'form.name' | transloco }}</label>
+          <input pInputText id="workspace-name" formControlName="name"/>
+        </div>
+
+        <div class="flex flex-col gap-1 flex-1">
+          <label for="workspace-vertical">{{ 'form.vertical' | transloco }}</label>
+          <p-select id="workspace-vertical"
+                    formControlName="verticalId"
+                    [options]="verticals()"
+                    optionValue="id"
+                    optionLabel="name"
+                    [placeholder]="'form.vertical' | transloco"
+                    appendTo="body"/>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <p-toggleSwitch id="workspace-active" formControlName="active"/>
+        <label for="workspace-active">{{ 'form.active' | transloco }}</label>
+      </div>
+
+      <app-form-section-title class="mt-6">{{ 'form.section.indexing' | transloco }}</app-form-section-title>
+
+      <div class="flex flex-col sm:flex-row gap-4">
+        <div class="flex flex-col gap-1 flex-1">
+          <label for="chunk-size">{{ 'form.chunkSize' | transloco }}</label>
+          <p-inputnumber id="chunk-size" formControlName="chunkSize" [min]="1" [useGrouping]="false"/>
+        </div>
+
+        <div class="flex flex-col gap-1 flex-1">
+          <label for="chunk-overlap">{{ 'form.chunkOverlap' | transloco }}</label>
+          <p-inputnumber id="chunk-overlap" formControlName="chunkOverlap" [min]="0" [useGrouping]="false"/>
+        </div>
+      </div>
+
+      <app-form-section-title class="mt-6">{{ 'form.section.reranking' | transloco }}</app-form-section-title>
+
+      <div class="flex flex-col sm:flex-row gap-4">
+        <div class="flex flex-col gap-1 flex-1">
+          <label for="prefetch-size">{{ 'form.prefetchSize' | transloco }}</label>
+          <p-inputnumber id="prefetch-size" formControlName="prefetchSize" [min]="1" [useGrouping]="false"/>
+        </div>
+
+        <div class="flex flex-col gap-1 flex-1">
+          <label for="top-k">{{ 'form.topK' | transloco }}</label>
+          <p-inputnumber id="top-k" formControlName="topK" [min]="1" [useGrouping]="false"/>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <p-toggleSwitch id="workspace-rerank" formControlName="rerank"/>
+        <label for="workspace-rerank">{{ 'form.rerank' | transloco }}</label>
+      </div>
+
+      <app-form-section-title class="mt-6">{{ 'form.section.owner' | transloco }}</app-form-section-title>
+
+      <div class="flex flex-col sm:flex-row gap-4">
+        <div class="flex flex-col gap-1 flex-1">
+          <label for="owner-email">{{ 'form.email' | transloco }}</label>
+          <input pInputText id="owner-email" formControlName="ownerEmail" type="email"/>
+        </div>
+
+        <div class="flex flex-col gap-1 flex-1">
+          <label for="owner-langue">{{ 'form.langue' | transloco }}</label>
+          <p-select id="owner-langue"
+                    formControlName="ownerLangue"
+                    [options]="langues"
+                    optionValue="value"
+                    optionLabel="i18n"
+                    appendTo="body">
+            <ng-template #selectedItem let-opt>{{ opt.i18n | transloco }}</ng-template>
+            <ng-template #item let-opt>{{ opt.i18n | transloco }}</ng-template>
+          </p-select>
+        </div>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-4">
+        <div class="flex flex-col gap-1 flex-1">
+          <label for="owner-firstName">{{ 'form.firstName' | transloco }}</label>
+          <input pInputText id="owner-firstName" formControlName="ownerFirstName"/>
+        </div>
+
+        <div class="flex flex-col gap-1 flex-1">
+          <label for="owner-lastName">{{ 'form.lastName' | transloco }}</label>
+          <input pInputText id="owner-lastName" formControlName="ownerLastName"/>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2">
+        <p-button [label]="'common.cancel' | transloco" severity="secondary" [text]="true" (onClick)="close()"
+                  [disabled]="store.isProcessing()"/>
+        <p-button [label]="(isEdit() ? 'common.save' : 'common.create') | transloco" (onClick)="onSave()"
+                  [disabled]="!isValid() || store.isProcessing()" [loading]="store.isProcessing()"/>
+      </div>
+
+    </form>
+  }
+
+</p-drawer>

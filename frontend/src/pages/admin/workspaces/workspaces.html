@@ -1,0 +1,13 @@
+<app-page-content title="nav.workspaces">
+
+<app-workspace-toolbar
+  [verticals]="verticals()"
+  (createRequested)="onCreate()"/>
+
+<app-workspace-table
+  (editRequested)="onEdit($event)"/>
+
+<app-workspace-form
+  [verticals]="verticals()"/>
+
+</app-page-content>

@@ -1,0 +1,40 @@
+<p-table [value]="store.items()" [stripedRows]="true" sortField="name" [sortOrder]="1">
+
+  <ng-template #header>
+    <tr>
+      <th pSortableColumn="name">{{ 'verticals.table.name' | transloco }}<p-sortIcon field="name"/></th>
+      <th class="w-16">{{ 'verticals.table.locked' | transloco }}</th>
+      <th class="w-24"></th>
+    </tr>
+  </ng-template>
+
+  <ng-template #body let-vertical>
+    <tr>
+      <td>{{ vertical.name }}</td>
+      <td>
+        @if (vertical.locked) {
+          <i class="pi pi-lock text-orange-400"></i>
+        }
+      </td>
+      <td>
+        <div class="flex gap-1">
+          <app-edit-button (clicked)="editRequested.emit(vertical)"/>
+          <app-delete-button [disabled]="vertical.locked" (confirmed)="onDelete(vertical)"/>
+        </div>
+      </td>
+    </tr>
+  </ng-template>
+
+  <ng-template #emptymessage>
+    <tr>
+      <td colspan="3" class="text-center text-surface-400 py-8">
+        @if (store.isProcessing()) {
+          {{ 'common.loading' | transloco }}
+        } @else {
+          {{ 'verticals.table.empty' | transloco }}
+        }
+      </td>
+    </tr>
+  </ng-template>
+
+</p-table>

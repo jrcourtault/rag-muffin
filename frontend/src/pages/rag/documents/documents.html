@@ -1,0 +1,11 @@
+<app-page-content title="nav.documents">
+
+<app-document-toolbar
+  (createRequested)="onCreate()"/>
+
+<app-document-table
+  (editRequested)="onEdit($event)"/>
+
+<app-document-form/>
+
+</app-page-content>

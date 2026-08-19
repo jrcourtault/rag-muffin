@@ -1,0 +1,40 @@
+spring:
+  application:
+    name: rag-muffin
+  profiles:
+    default: dev
+  web:
+    error: # Messages d'erreur => on ne veut pas afficher les stacktraces et les messages d'erreur de hibernate par exemple (sinon on affiche les requetes qui posent pb car on donne des infos sur les tables)
+      include-message: never
+      include-stacktrace: never
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 55MB
+  data:
+    web:
+      pageable:
+        default-page-size: 10
+        max-page-size: 100
+  liquibase:
+    change-log: classpath:/db/changelog/db.changelog-master.yaml
+
+app:
+  cleanup:
+    cron: "0 0 2 * * *"
+    error-retention-days: 7
+  upload:
+    # PDF : pdf
+    # Texte : txt, md, csv, tsv, rtf, html, htm, xml, json, yaml, yml, log
+    # Word / Writer : docx, doc, docm, dotm, odt
+    # PowerPoint / Impress : pptx, ppt, pptm, ppsx, pps, ppsm, potm, odp
+    # Excel / Calc : xlsx, xls, xlsm, xltx, ods
+    allowed-extensions: pdf,txt,md,csv,tsv,rtf,html,htm,xml,json,yaml,yml,log,docx,doc,docm,dotm,odt,pptx,ppt,pptm,ppsx,pps,ppsm,potm,odp,xlsx,xls,xlsm,xltx,ods
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+          - prometheus

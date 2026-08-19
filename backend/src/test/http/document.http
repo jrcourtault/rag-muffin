@@ -1,0 +1,94 @@
+### Upload un PDF
+POST {{api_url}}/api/workspaces/72e9ca45-7cb3-4b03-9f60-f9c4e1292ea8/documents
+Authorization: Bearer {{access_token}}
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="request"
+Content-Type: application/json
+
+{"name": "Document technique DT49"}
+--boundary
+Content-Disposition: form-data; name="file"; filename="dt49.pdf"
+Content-Type: application/pdf
+
+< /Users/jean/Desktop/dt49.pdf
+--boundary--
+
+### Upload un DOCX
+POST {{api_url}}/api/workspaces/00000000-0000-0000-0000-000000000001/documents
+Authorization: Bearer {{access_token}}
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="request"
+Content-Type: application/json
+
+{"name": "Document de test"}
+--boundary
+Content-Disposition: form-data; name="file"; filename="test.docx"
+Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document
+
+< /Users/jean/Desktop/test.docx
+--boundary--
+
+### Upload un TXT
+POST {{api_url}}/api/workspaces/00000000-0000-0000-0000-000000000001/documents
+Authorization: Bearer {{access_token}}
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="request"
+Content-Type: application/json
+
+{"name": "Notes de test"}
+--boundary
+Content-Disposition: form-data; name="file"; filename="test.txt"
+Content-Type: text/plain
+
+Contenu de test pour le fichier texte.
+--boundary--
+
+### Modifier le nom d'un document
+PUT {{api_url}}/api/workspaces/58277d76-89a6-4dcc-9aff-45fa7924127e/documents/5f68ca41-5f88-47e2-a0cd-66aa4a1314b1
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+{"name": "Nouveau nom du document"}
+
+### Lister les documents d'un workspace (paginé)
+GET {{api_url}}/api/workspaces/58277d76-89a6-4dcc-9aff-45fa7924127e/documents?page=0&size=10&sort=filename,asc
+Authorization: Bearer {{access_token}}
+
+### Lister les documents filtrés par extension
+GET {{api_url}}/api/workspaces/58277d76-89a6-4dcc-9aff-45fa7924127e/documents?extension=pdf
+Authorization: Bearer {{access_token}}
+
+### Lister les documents filtrés par statut
+GET {{api_url}}/api/workspaces/58277d76-89a6-4dcc-9aff-45fa7924127e/documents?status=INDEXED
+Authorization: Bearer {{access_token}}
+
+### Lister les documents filtrés par content type
+GET {{api_url}}/api/workspaces/58277d76-89a6-4dcc-9aff-45fa7924127e/documents?contentType=application/pdf
+Authorization: Bearer {{access_token}}
+
+### Lister avec plusieurs filtres combinés
+GET {{api_url}}/api/workspaces/58277d76-89a6-4dcc-9aff-45fa7924127e/documents?extension=pdf&status=INDEXED
+Authorization: Bearer {{access_token}}
+
+### Consulter un document par ID
+GET {{api_url}}/api/workspaces/58277d76-89a6-4dcc-9aff-45fa7924127e/documents/5f68ca41-5f88-47e2-a0cd-66aa4a1314b1
+Authorization: Bearer {{access_token}}
+
+### Télécharger un document
+GET {{api_url}}/api/workspaces/58277d76-89a6-4dcc-9aff-45fa7924127e/documents/5f68ca41-5f88-47e2-a0cd-66aa4a1314b1/download
+Authorization: Bearer {{access_token}}
+
+### Supprimer un document
+DELETE {{api_url}}/api/workspaces/58277d76-89a6-4dcc-9aff-45fa7924127e/documents/58277d76-89a6-4dcc-9aff-45fa7924127e
+Authorization: Bearer {{access_token}}
+
+### SSE — écouter les événements de statut des documents
+GET {{api_url}}/api/workspaces/58277d76-89a6-4dcc-9aff-45fa7924127e/documents/ingestion-events
+Authorization: Bearer {{access_token}}
+Accept: text/event-stream

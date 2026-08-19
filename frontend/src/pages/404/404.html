@@ -1,0 +1,10 @@
+<div class="flex h-full items-center justify-center">
+  <div class="text-center text-surface-500">
+    <div class="text-8xl font-bold mb-2">404</div>
+    <p class="text-xl mb-6">{{ 'notFound.message' | transloco }}</p>
+    <a [routerLink]="['/']" class="p-button p-button-text">
+      <i class="pi pi-arrow-left mr-2"></i>
+      {{ 'notFound.backHome' | transloco }}
+    </a>
+  </div>
+</div>

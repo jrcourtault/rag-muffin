@@ -1,0 +1,55 @@
+logging:
+  level:
+    fr.drjeanjean.ragmuffin: DEBUG
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8081/realms/rag-muffin
+          jwk-set-uri: http://localhost:8081/realms/rag-muffin/protocol/openid-connect/certs
+  artemis:
+    broker-url: tcp://localhost:61616?consumerWindowSize=0
+    user: admin
+    password: admin
+  jms:
+    listener:
+      min-concurrency: 1 # nombre de threads consommant la queue d'ingestion (augmenter si l'ingestion est lente)
+      max-concurrency: 3 # max threads JMS (ex: 4-8 pour un import massif)
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: postgres
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show_sql: true
+
+app:
+  keycloak:
+    base-url: http://localhost:8081
+    realm: rag-muffin
+    admin-client-id: admin-cli
+    admin-username: admin
+    admin-password: admin
+    app-client-id: frontend
+    app-redirect-uri: http://localhost:4200
+  upload:
+    directory: ./backend/volumes/documents/uploads
+  embedding:
+    base-url: http://localhost:8090
+  qdrant:
+    host: localhost
+    port: 6334
+    api-key: rag-muffin
+    collection-name: documents
+  tika:
+    base-url: http://localhost:9998
+  reranker:
+    base-url: http://localhost:8091
+  default-llm-config:
+    base-url: http://localhost:12434/engines/v1
+    api-key:
+    model: llama3.2:16k
+

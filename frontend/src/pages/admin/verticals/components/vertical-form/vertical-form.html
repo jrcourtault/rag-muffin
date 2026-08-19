@@ -1,0 +1,37 @@
+<p-drawer
+  [header]="(isEdit() ? 'common.modifyTitle' : 'common.createTitle') | transloco"
+  [visible]="visible()"
+  [modal]="true"
+  position="bottom"
+  [style]="{ height: 'auto', maxHeight: '90vh' }"
+  (onHide)="close()">
+
+  <form [formGroup]="form" (ngSubmit)="onSave()" class="flex flex-col gap-4 max-w-2xl mx-auto">
+
+    <div class="flex flex-col gap-1">
+      <label for="vertical-name">{{ 'form.name' | transloco }}</label>
+      <input pInputText id="vertical-name" formControlName="name"/>
+    </div>
+
+    <app-form-section-title class="mt-6">{{ 'form.section.prompts' | transloco }}</app-form-section-title>
+
+    <div class="flex flex-col gap-1">
+      <label for="query-rewrite-prompt">{{ 'form.queryRewritePrompt' | transloco }}</label>
+      <textarea pTextarea id="query-rewrite-prompt" formControlName="queryRewritePrompt" rows="4" class="w-full"></textarea>
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label for="system-prompt">{{ 'form.systemPrompt' | transloco }}</label>
+      <textarea pTextarea id="system-prompt" formControlName="systemPrompt" rows="8" class="w-full"></textarea>
+    </div>
+
+    <div class="flex justify-end gap-2">
+      <p-button [label]="'common.cancel' | transloco" severity="secondary" [text]="true" (onClick)="close()"
+                [disabled]="store.isProcessing()"/>
+      <p-button [label]="(isEdit() ? 'common.save' : 'common.create') | transloco" (onClick)="onSave()"
+                [disabled]="!isValid() || store.isProcessing()" [loading]="store.isProcessing()"/>
+    </div>
+
+  </form>
+
+</p-drawer>
