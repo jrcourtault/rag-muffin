@@ -116,6 +116,25 @@ Spring Boot 4 (REST API)
 
 ---
 
+## Hardware Requirements
+
+By default, `backend/docker-compose-dev.yml` requests an **NVIDIA GPU** for two services — `docker compose up` will
+**fail** on them without one:
+
+| Service      | Why it needs NVIDIA by default                                                                               |
+|--------------|--------------------------------------------------------------------------------------------------------------|
+| `embeddings` | BGE-M3 (FastAPI) — Dockerfile installs PyTorch with CUDA 12.8 by default                                     |
+| `reranker`   | BGE-Reranker-v2-M3 — the `ghcr.io/huggingface/text-embeddings-inference` Docker image requires an NVIDIA GPU |
+
+This affects **any machine without an NVIDIA GPU, including Apple Silicon Macs** — Docker Desktop on macOS cannot pass
+through the Metal GPU to a container. To run on such a machine, both services must be switched to CPU (slower), and on
+Mac the reranker can instead be compiled and run natively with Metal support. See
+**[INSTALL-dev.md](INSTALL-dev.md#running-embeddings-and-reranker-on-cpu-no-nvidia-gpu)** for the exact steps.
+
+All other services (PostgreSQL, Qdrant, ActiveMQ, Tika, Mailpit, Keycloak) are architecture-agnostic and need no GPU.
+
+---
+
 ## Getting Started
 
 See **[INSTALL-dev.md](INSTALL-dev.md)** for development setup and **[INSTALL-prod.md](INSTALL-prod.md)** for
