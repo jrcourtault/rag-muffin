@@ -184,19 +184,17 @@ Browse available models: `docker model list` after pulling, or check Docker Hub.
 cd backend && mvn spring-boot:run
 ```
 
-## Create the first admin user in Keycloak
+## First admin user
 
-Before starting the frontend, you need to create a first user with the `ADMIN` role in Keycloak.
+`keycloak/realm-export-dev.json` already seeds a first user with the `ADMIN` role in the `rag-muffin` realm, so
+there's nothing to set up manually:
 
-1. Open the Keycloak admin console: [http://localhost:8081](http://localhost:8081)
-2. Log in with `admin` / `admin` (credentials defined in `docker-compose-dev.yml`)
-3. Select the `rag-muffin` realm (in "Manage realms")
-4. Go to **Users** → **Create new user**
-5. Fill in the email and check "Email verified" → **Create**
-6. Go to the **Credentials** tab → **Set password** (disable "Temporary")
-7. Go to the **Role mapping** tab → **Assign role** → **Realm roles** → select `ADMIN` → **Assign**
+- Email / username: `admin@rag-muffin.fr`
+- Password: `admin`
 
-This user will be able to log into the application and manage workspaces and verticals.
+This user can log into the application and manage workspaces and verticals. The Keycloak admin console itself
+(distinct from this application user) is available at [http://localhost:8081](http://localhost:8081), login
+`admin` / `admin` (credentials defined in `docker-compose-dev.yml`).
 
 ## Start the Frontend
 

@@ -156,7 +156,8 @@ cd frontend && npm install && npm run generate:api
 cd frontend && ng serve
 ```
 
-Then open [http://localhost:4200](http://localhost:4200).
+Then open [http://localhost:4200](http://localhost:4200) and log in with the seeded admin account:
+`admin@rag-muffin.fr` / `admin` (see [INSTALL-dev.md](INSTALL-dev.md#first-admin-user)).
 
 ---
 
