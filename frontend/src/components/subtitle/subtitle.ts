@@ -5,6 +5,7 @@ import {TranslocoPipe} from '@jsverse/transloco';
   selector: 'app-subtitle',
   templateUrl: './subtitle.html',
   imports: [TranslocoPipe],
+  host: { '[attr.title]': 'null' },
 })
 export class Subtitle {
   readonly title = input.required<string>();

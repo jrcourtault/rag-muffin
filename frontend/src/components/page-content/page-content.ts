@@ -6,6 +6,7 @@ import {Card} from 'primeng/card';
   selector: 'app-page-content',
   templateUrl: './page-content.html',
   imports: [TranslocoPipe, Card],
+  host: { '[attr.title]': 'null' },
 })
 export class PageContent {
   readonly title = input.required<string>();
