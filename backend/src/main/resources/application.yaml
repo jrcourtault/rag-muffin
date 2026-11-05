@@ -44,6 +44,8 @@ app:
     timeout: 5m # un lot de 32 chunks peut être long sur CPU
   qdrant:
     timeout: 2m
+  llm:
+    timeout: 2m # par appel : une question avec reformulation fait deux appels
   llm-url:
     # https + nom de domaine : refuse les IP, localhost et les noms internes (protection SSRF)
     allowed-pattern: '^https://([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(:\d+)?(/[^?#\s]*)?$'

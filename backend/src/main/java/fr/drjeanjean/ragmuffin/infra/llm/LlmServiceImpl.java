@@ -2,15 +2,20 @@ package fr.drjeanjean.ragmuffin.infra.llm;
 
 import fr.drjeanjean.ragmuffin.infra.llm.dto.LlmConfig;
 import fr.drjeanjean.ragmuffin.infra.llm.dto.Message;
+import fr.drjeanjean.ragmuffin.infra.llm.properties.LlmProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.net.http.HttpClient;
+import java.time.Duration;
 import java.util.List;
 
 @Slf4j
@@ -18,10 +23,23 @@ import java.util.List;
 @Profile("!test")
 public class LlmServiceImpl implements LlmService {
 
+    private static final Duration CONNECT_TIMEOUT = Duration.ofSeconds(5);
+
+    private final JdkClientHttpRequestFactory requestFactory;
+
+    public LlmServiceImpl(LlmProperties properties) {
+        var httpClient = HttpClient.newBuilder()
+                .connectTimeout(CONNECT_TIMEOUT)
+                .build();
+        this.requestFactory = new JdkClientHttpRequestFactory(httpClient);
+        this.requestFactory.setReadTimeout(properties.timeout());
+    }
+
     @Override
     public String chat(List<Message> messages, LlmConfig config) {
         var restClient = RestClient.builder()
                 .baseUrl(config.baseUrl())
+                .requestFactory(requestFactory)
                 .defaultHeader("Authorization", "Bearer " + config.apiKey())
                 .build();
 
@@ -54,6 +72,9 @@ public class LlmServiceImpl implements LlmService {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Context exceeds LLM capacity. Reduce the number of documents or chunk size.");
             }
             log.error("LLM error {}: {}", e.getStatusCode(), body);
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "LLM service error.");
+        } catch (ResourceAccessException e) {
+            log.error("LLM unreachable or too slow: {}", e.getMessage());
             throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "LLM service error.");
         }
     }
