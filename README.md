@@ -152,6 +152,8 @@ account: `admin@rag-muffin.fr` / `admin` (see [INSTALL-dev.md](INSTALL-dev.md#fi
 - **Accounting anomaly detection** — flag anomalies in accounting documents for the Experts-comptables vertical
 - **Production deployment** — Traefik reverse proxy with automatic HTTPS
 - **Monitoring** — Grafana, Prometheus and Loki
+- **Database connection handling during LLM calls** — release the connection while waiting for the LLM, so that slow
+  answers cannot exhaust the pool
 
 ---
 

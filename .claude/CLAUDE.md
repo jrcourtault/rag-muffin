@@ -556,6 +556,17 @@ suivante sans avoir validé la précédente.
 - Même traitement au début du listener JMS, qui ne passe pas par HTTP
 - Ajouter %X{workspace_id} au format des logs
   🎯 Validé quand : chaque ligne de log liée à un workspace affiche son workspace_id
+
+ÉTAPE 14.4 — Ne pas garder de connexion BDD pendant l'appel LLM
+- Aujourd'hui, /ask et /search gardent une connexion pendant tout l'appel LLM (jusqu'à app.llm.timeout)
+- Dix questions lentes saturent le pool Hikari et bloquent toute l'application
+- Deux causes : le @Transactional de RagController, et Open Session In View, qui garde la connexion
+  jusqu'à la fin de la requête même sans transaction
+- Le retrait de @Transactional seul ne suffit pas (à confirmer avec le test ci-dessous)
+- Pistes : open-in-view: false, hibernate.connection.handling_mode à
+  DELAYED_ACQUISITION_AND_RELEASE_AFTER_TRANSACTION, ou exclure les routes RAG de l'intercepteur
+  🎯 Validé quand : avec un pool d'une connexion et un LLM qui ne répond pas, la liste des documents
+    s'affiche immédiatement pendant qu'une question est en attente
 ```
 
 
