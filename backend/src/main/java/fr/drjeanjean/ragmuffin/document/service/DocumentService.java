@@ -84,6 +84,14 @@ public class DocumentService {
         documentRepository.deleteByWorkspaceId(workspaceId);
     }
 
+    public void rename(Document document, String name) {
+        if (!document.isRenamable()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This document is not renamable...");
+        }
+        document.rename(name);
+        qdrantService.updateFileName(document.getId(), document.getWorkspace().getId(), document.getFileName());
+    }
+
     public void delete(Document document) {
         if (!document.isDeletable()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This document is not deletable...");

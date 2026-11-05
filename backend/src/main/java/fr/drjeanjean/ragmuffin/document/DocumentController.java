@@ -55,7 +55,7 @@ public class DocumentController {
             @RequestBody @Valid UpdateDocumentRequest request) {
         var document = documentService.findById(id);
         securityService.checkBelongsToWorkspace(document, workspaceId);
-        document.rename(request.name());
+        documentService.rename(document, request.name());
         return DocumentMapper.INSTANCE.toResponse(document);
     }
 

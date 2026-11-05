@@ -34,6 +34,16 @@ public interface QdrantService {
     List<ScoredChunk> search(DenseEmbedding denseVector, SparseEmbedding sparseVector, UUID workspaceId, int topK);
 
     /**
+     * Met à jour le nom de fichier stocké sur tous les chunks d'un document.
+     * Ce nom est celui que le LLM cite comme source : il doit rester aligné sur PostgreSQL.
+     *
+     * @param documentId  identifiant du document renommé
+     * @param workspaceId identifiant du workspace — filtre obligatoire pour l'isolation des données
+     * @param fileName    nouveau nom de fichier
+     */
+    void updateFileName(UUID documentId, UUID workspaceId, String fileName);
+
+    /**
      * Supprime tous les chunks associés à un document dans Qdrant.
      * Appelé lors de la suppression d'un document pour maintenir la cohérence
      * entre PostgreSQL et Qdrant.

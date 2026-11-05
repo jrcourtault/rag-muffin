@@ -26,6 +26,11 @@ public class QdrantServiceMock implements QdrantService {
     }
 
     @Override
+    public void updateFileName(UUID documentId, UUID workspaceId, String fileName) {
+        // No-op
+    }
+
+    @Override
     public void deleteByDocumentId(UUID documentId) {
         // No-op
     }

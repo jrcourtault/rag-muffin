@@ -86,4 +86,8 @@ public class Document {
         return this.status == DocumentStatus.INDEXED
                 || this.status == DocumentStatus.ERROR;
     }
+
+    public boolean isRenamable() {
+        return this.status != DocumentStatus.PENDING;
+    }
 }

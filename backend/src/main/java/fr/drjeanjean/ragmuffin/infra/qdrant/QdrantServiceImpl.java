@@ -193,6 +193,18 @@ public class QdrantServiceImpl implements QdrantService {
 
     @Override
     @SneakyThrows
+    public void updateFileName(UUID documentId, UUID workspaceId, String fileName) {
+        var filter = Filter.newBuilder()
+                .addMust(matchKeyword("document_id", documentId.toString()))
+                .addMust(matchKeyword("workspace_id", workspaceId.toString()))
+                .build();
+
+        qdrantClient.setPayloadAsync(qdrantProperties.collectionName(), Map.of("file_name", value(fileName)),
+                filter, true, null, null).get();
+    }
+
+    @Override
+    @SneakyThrows
     public void deleteByDocumentId(UUID documentId) {
         var filter = Filter.newBuilder()
                 .addMust(matchKeyword("document_id", documentId.toString()))

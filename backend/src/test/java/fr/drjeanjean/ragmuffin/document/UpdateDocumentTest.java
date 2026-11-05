@@ -30,6 +30,20 @@ class UpdateDocumentTest {
     private static final String WORKSPACE_A = "a1b2c3d4-e5f6-7890-abcd-ef1234567890";
     private static final String SUBJECT = "a1b2c3d4-e5f6-7890-abcd-ef1234567890";
     private static final String INDEXED_DOC_ID = "c3d4e5f6-a7b8-9012-cdef-345678901234";
+    private static final String WORKSPACE_B = "b2c3d4e5-f6a7-8901-bcde-f12345678901";
+    private static final String PENDING_DOC_ID = "d4e5f6a7-b8c9-0123-defa-456789012345";   // workspace B
+
+    @Test
+    @Sql(scripts = {"/sql/clean.sql", "/sql/workspaces.sql", "/sql/users.sql", "/sql/documents.sql"})
+    void shouldReturn400_whenDocumentIsPending() throws Exception {
+        mockMvc.perform(put("/api/workspaces/{workspaceId}/documents/{id}", WORKSPACE_B, PENDING_DOC_ID)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"name": "Nouveau nom du document"}
+                                """)
+                        .with(jwt(SUBJECT)))
+                .andExpect(status().isBadRequest());
+    }
 
     @Test
     @Sql(scripts = {"/sql/clean.sql", "/sql/workspaces.sql", "/sql/users.sql", "/sql/documents.sql"})
