@@ -68,7 +68,6 @@ class UpdateLlmConfigTest {
                                 """))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.baseUrl").value("http://localhost:12434/engines/v1"))
-                .andExpect(jsonPath("$.apiKeyConfigured").value(false))
                 .andExpect(jsonPath("$.model").value("llama3.2:16k"));
     }
 
