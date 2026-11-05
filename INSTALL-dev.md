@@ -104,7 +104,7 @@ curl http://localhost:12434/engines/v1/chat/completions \
 ## Start the Dev Stack
 
 ```bash
-docker compose -f backend/docker-compose-dev.yml up -d
+docker compose -f docker-compose-dev.yml up -d
 ```
 
 **Note: wait for the embedding server to finish loading its models before making requests.**

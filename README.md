@@ -118,7 +118,7 @@ Spring Boot 4 (REST API)
 
 ## Hardware Requirements
 
-By default, `backend/docker-compose-dev.yml` requests an **NVIDIA GPU** for two services — `docker compose up` will
+By default, `docker-compose-dev.yml` requests an **NVIDIA GPU** for two services — `docker compose up` will
 **fail** on them without one:
 
 | Service      | Why it needs NVIDIA by default                                                                               |

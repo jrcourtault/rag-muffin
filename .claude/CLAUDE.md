@@ -223,6 +223,7 @@ Quand un utilisateur pose une question, voici ce qui se passe dans l'ordre :
 ```
 rag-platform/
 ├── CLAUDE.md                        ← ce fichier
+├── docker-compose-dev.yml           ← stack de dev (services Docker)
 ├── backend/                         ← Projet Spring Boot 4
 ├── embeddings/                      ← Serveur BGE-M3 (FastAPI + FlagEmbedding)
 ├── frontend/                        ← Projet Angular 21 + PrimeNG
@@ -783,7 +784,7 @@ de profil.
 # ── DEV LOCAL ──
 
 # Lancer la stack de dev (télécharge ai/mistral-nemo automatiquement au premier lancement)
-docker compose -f backend/docker-compose-dev.yml up -d
+docker compose -f docker-compose-dev.yml up -d
 
 # Lancer le backend Spring Boot (hors Docker)
 cd backend && mvn spring-boot:run

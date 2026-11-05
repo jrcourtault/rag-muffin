@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-COMPOSE_FILE="backend/docker-compose-dev.yml"
+COMPOSE_FILE="docker-compose-dev.yml"
 SERVICE="embeddings"
 
 echo "=== Audit des dependances Python ($SERVICE) ==="

@@ -7,7 +7,7 @@ API REST du projet RAG-Muffin.
 ### 1. Démarrer les services Docker
 
 ```bash
-docker compose -f backend/docker-compose-dev.yml up -d
+docker compose -f docker-compose-dev.yml up -d
 ```
 
 ### 2. Lancer le backend

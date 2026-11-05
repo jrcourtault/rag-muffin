@@ -14,13 +14,13 @@ services:
     ports:
       - '5432:5432'
 
-  embeddings: #Pour forcer le build du projet /embeddings : docker compose -f backend/docker-compose-dev.yml build embeddings --no-cache
+  embeddings: #Pour forcer le build du projet /embeddings : docker compose -f docker-compose-dev.yml build embeddings --no-cache
     # Pour repasser en CPU (Mac ou machine sans GPU NVIDIA) :
     #   1. Dans embeddings/Dockerfile, remplacer "whl/cu***" par "whl/cpu"
     #   2. Supprimer le bloc "deploy" ci-dessous
-    #   3. Rebuilder : docker compose -f backend/docker-compose-dev.yml build embeddings --no-cache
+    #   3. Rebuilder : docker compose -f docker-compose-dev.yml build embeddings --no-cache
     container_name: embeddings
-    build: ../embeddings
+    build: ./embeddings
     environment:
       UVICORN_WORKERS: 1 # Nb instances de l'embeddings (géré par python)
     deploy:
@@ -119,7 +119,7 @@ services:
       #KC_HTTP_RELATIVE_PATH: /
     command: start --import-realm --spi-connections-jpa-default-migration-strategy=update --http-enabled=true --proxy-headers=xforwarded
     volumes:
-      - ../keycloak/realm-export-dev.json:/opt/keycloak/data/import/realm.json
+      - ./keycloak/realm-export-dev.json:/opt/keycloak/data/import/realm.json
     #  - ./trucs/keycloak/themes/rag-muffin:/opt/keycloak/themes/rag-muffin
     ports:
       - "8081:8080"

@@ -10,7 +10,7 @@ Analyse l'ensemble du code source du projet et vérifie systématiquement les po
    - les fichiers exclus par .gitignore
    - les fichiers dans les répertoires cachés comme : .mvn
    - les fichiers docker-compose-dev.yml
-2. Prend note que le fichier docker-compose-dev.yml dans backend ne sera utilisé qu'en dev, donc ce n'est pas grave s'il y a des problèmes
+2. Prend note que le fichier docker-compose-dev.yml à la racine ne sera utilisé qu'en dev, donc ce n'est pas grave s'il y a des problèmes
 3. Lis et analyse chaque fichier de code
 4. Produis un rapport structuré en français
 5. N'affiche pas les points qui sont OK
