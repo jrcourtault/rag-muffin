@@ -140,24 +140,8 @@ All other services (PostgreSQL, Qdrant, ActiveMQ, Tika, Mailpit, Keycloak) are a
 See **[INSTALL-dev.md](INSTALL-dev.md)** for development setup and **[INSTALL-prod.md](INSTALL-prod.md)** for
 production.
 
-**Quick start (dev):**
-
-```bash
-# 1. Start the stack (downloads the LLM automatically on first run)
-docker compose -f backend/docker-compose-dev.yml up -d
-
-# 2. Start the backend
-cd backend && mvn spring-boot:run
-
-# 3. Install frontend dependencies and generate the API client (first time only)
-cd frontend && npm install && npm run generate:api
-
-# 4. Start the frontend (outside Docker, hot reload)
-cd frontend && ng serve
-```
-
-Then open [http://localhost:4200](http://localhost:4200) and log in with the seeded admin account:
-`admin@rag-muffin.fr` / `admin` (see [INSTALL-dev.md](INSTALL-dev.md#first-admin-user)).
+Once the dev setup is complete, open [http://localhost:4200](http://localhost:4200) and log in with the seeded admin
+account: `admin@rag-muffin.fr` / `admin` (see [INSTALL-dev.md](INSTALL-dev.md#first-admin-user)).
 
 ---
 

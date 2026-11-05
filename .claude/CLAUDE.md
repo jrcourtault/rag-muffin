@@ -269,6 +269,12 @@ négociable. Le client Dupont ne doit JAMAIS voir les documents du client Martin
 Le corpus partagé (Légifrance, BOFIP) est indexé avec `source: "shared"` et accessible en lecture à tous les workspaces
 d'une verticale.
 
+### Clés API LLM : pas de clé partagée en prod
+
+`app.default-llm-config.api-key` n'est jamais renseignée en prod. Chaque OWNER saisit la clé de son workspace : aucune
+clé de la plateforme n'est copiée dans les workspaces par `WorkspaceMapper`, donc aucune n'est exposée par le `baseUrl`
+librement choisi par l'OWNER. Ce n'est pas une faille, tant que cette règle est respectée.
+
 ---
 
 ## Conventions de code
