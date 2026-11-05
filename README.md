@@ -13,7 +13,7 @@
 ## What is this?
 
 RAG-Muffin is a **multi-tenant, multi-vertical Retrieval-Augmented Generation (RAG) platform** that lets businesses
-query their own documents using natural language. Users upload files (PDFs, Word documents, emails…), the system indexes
+query their own documents using natural language. Users upload files (PDFs, Word documents, spreadsheets…), the system indexes
 them, and when a question is asked, it retrieves the most relevant passages and generates a sourced answer.
 
 **Multi-tenant** — each client operates in an isolated **workspace** (strict data separation; one client never sees
@@ -27,9 +27,9 @@ The platform currently serves **6 verticals**:
 | **Generic**                     | Built-in general-purpose vertical, available out of the box         |
 | **Parachutisme**                | DGAC regulations, technical manuals, safety procedures, training    |
 | **Avocats / Notaires**          | Case law, statutes (Légifrance), contracts, legal deeds             |
-| **Experts-comptables**          | Tax documents (BOFIP, CGI), accounting standards, anomaly detection |
+| **Experts-comptables**          | Tax documents (BOFIP, CGI), accounting standards                    |
 | **Knowledge Management PME**    | Capture and query internal company knowledge                        |
-| **Intelligence Administrative** | Aggregate emails, documents, scans and make them queryable          |
+| **Intelligence Administrative** | Aggregate documents and scans and make them queryable               |
 
 New verticals can be created by a super-admin, with custom prompts and RAG settings.
 
@@ -111,8 +111,6 @@ Spring Boot 4 (REST API)
 | Auth             | Keycloak 26                                         |
 | LLM (dev)        | Docker Model Runner + Llama 3.2 3B (`llama3.2:16k`) |
 | LLM (prod)       | Configurable per workspace                          |
-| Reverse proxy    | Traefik 3 (prod)                                    |
-| Monitoring       | Grafana + Prometheus + Loki                         |
 
 ---
 
@@ -150,6 +148,10 @@ account: `admin@rag-muffin.fr` / `admin` (see [INSTALL-dev.md](INSTALL-dev.md#fi
 - **Shared public corpora** — regulations and standards served across all workspaces of a vertical
 - **PostgreSQL Row-Level Security** — database-level workspace isolation, in addition to the application checks
 - **Workspace-aware logging** — `workspace_id` in every log line through SLF4J MDC
+- **Email ingestion** — index `.eml` and `.msg` files alongside other documents
+- **Accounting anomaly detection** — flag anomalies in accounting documents for the Experts-comptables vertical
+- **Production deployment** — Traefik reverse proxy with automatic HTTPS
+- **Monitoring** — Grafana, Prometheus and Loki
 
 ---
 
