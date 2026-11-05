@@ -37,6 +37,13 @@ app:
     # PowerPoint / Impress : pptx, ppt, pptm, ppsx, pps, ppsm, potm, odp
     # Excel / Calc : xlsx, xls, xlsm, xltx, ods
     allowed-extensions: pdf,txt,md,csv,tsv,rtf,html,htm,xml,json,yaml,yml,log,docx,doc,docm,dotm,odt,pptx,ppt,pptm,ppsx,pps,ppsm,potm,odp,xlsx,xls,xlsm,xltx,ods
+  # Timeouts de l'ingestion : larges, car une réponse trop lente fait rejouer tout le document
+  tika:
+    timeout: 10m # l'OCR d'un gros scan peut prendre plusieurs minutes
+  embedding:
+    timeout: 5m # un lot de 32 chunks peut être long sur CPU
+  qdrant:
+    timeout: 2m
   llm-url:
     # https + nom de domaine : refuse les IP, localhost et les noms internes (protection SSRF)
     allowed-pattern: '^https://([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(:\d+)?(/[^?#\s]*)?$'

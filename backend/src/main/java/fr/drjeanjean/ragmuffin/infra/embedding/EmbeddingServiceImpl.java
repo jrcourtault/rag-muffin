@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
 import java.net.http.HttpClient;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -23,6 +24,7 @@ import org.springframework.http.client.JdkClientHttpRequestFactory;
 public class EmbeddingServiceImpl implements EmbeddingService {
 
     private static final int MAX_BATCH_SIZE = 32;
+    private static final Duration CONNECT_TIMEOUT = Duration.ofSeconds(5);
 
     private final RestClient client;
 
@@ -31,10 +33,13 @@ public class EmbeddingServiceImpl implements EmbeddingService {
         // que les serveurs ASGI (uvicorn, hypercorn) ne gèrent pas correctement
         var httpClient = HttpClient.newBuilder()
                 .version(HttpClient.Version.HTTP_1_1)
+                .connectTimeout(CONNECT_TIMEOUT)
                 .build();
+        var requestFactory = new JdkClientHttpRequestFactory(httpClient);
+        requestFactory.setReadTimeout(properties.timeout());
         this.client = RestClient.builder()
                 .baseUrl(properties.baseUrl())
-                .requestFactory(new JdkClientHttpRequestFactory(httpClient))
+                .requestFactory(requestFactory)
                 .build();
     }
 
