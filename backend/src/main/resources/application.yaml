@@ -3,6 +3,9 @@ spring:
     name: rag-muffin
   profiles:
     default: dev
+  threads:
+    virtual:
+      enabled: true
   web:
     error: # Messages d'erreur => on ne veut pas afficher les stacktraces et les messages d'erreur de hibernate par exemple (sinon on affiche les requetes qui posent pb car on donne des infos sur les tables)
       include-message: never
