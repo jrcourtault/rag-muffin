@@ -59,6 +59,7 @@ export class LlmConfig {
       const {baseUrl, apiKey, model} = this.form.getRawValue();
       const config = await this.llmConfigController.updateLlmConfig({workspaceId, body: {baseUrl, apiKey: apiKey || undefined, model}});
       this.apiKeyConfigured.set(config.apiKeyConfigured ?? false);
+      this.form.controls.apiKey.reset();
       this.toastService.success();
     } finally {
       this.saving.set(false);
