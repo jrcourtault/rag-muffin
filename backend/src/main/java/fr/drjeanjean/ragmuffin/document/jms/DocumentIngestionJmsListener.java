@@ -54,13 +54,17 @@ public class DocumentIngestionJmsListener {
 
         var text = tikaService.extract(filePath);
         if (text.isEmpty()) {
-            throw new RuntimeException("No text extracted from " + fileName + " — empty document, or OCR found no text");
+            log.error("No text extracted from document {} ({}): empty document, or OCR found no text", documentId, fileName);
+            markError(documentId);
+            return; // Pas d'exception : réessayer ne changerait rien, le broker ne doit pas rejouer le message
         }
         log.info("Document {} : {} characters extracted from {}", documentId, text.length(), fileName);
 
         var chunkTexts = chunkingService.chunk(text, workspace.getChunkSize(), workspace.getChunkOverlap());
         if (chunkTexts.isEmpty()) {
-            throw new RuntimeException("No chunks generated from " + fileName);
+            log.error("No chunks generated from document {} ({})", documentId, fileName);
+            markError(documentId);
+            return;
         }
         log.info("Document {} : split into {} chunks", documentId, chunkTexts.size());
 
@@ -88,7 +92,11 @@ public class DocumentIngestionJmsListener {
     public void onDlq(String json) {
         var message = jsonMapper.readValue(json, IngestionJmsMessage.class);
         log.error("Ingestion definitively failed for document {} after all retries", message.documentId());
-        documentRepository.findById(message.documentId()).ifPresent(document -> {
+        markError(message.documentId());
+    }
+
+    private void markError(UUID documentId) {
+        documentRepository.findById(documentId).ifPresent(document -> {
             document.markError();
             documentRepository.save(document);
         });
