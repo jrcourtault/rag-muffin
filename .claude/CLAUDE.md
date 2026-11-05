@@ -135,11 +135,11 @@ Réseau interne Docker (aucun accès externe) :
                 ──► [API Mistral] (externe, HTTPS)
 ```
 
-En prod : Traefik, Keycloak, HTTPS, pas d'Ollama (API Mistral à la place).
+En prod : Traefik, Keycloak, HTTPS, et l'API Mistral à la place de Docker Model Runner.
 
 Deux réseaux Docker en prod :
 
-- `frontend-net` : Traefik, Vue.js, Spring Boot, Keycloak
+- `frontend-net` : Traefik, Angular (Nginx), Spring Boot, Keycloak
 - `backend-net` (internal: true) : Spring Boot, PostgreSQL, Qdrant, ActiveMQ, BGE-M3 FastAPI — **pas d'accès internet**
 
 ---
@@ -150,13 +150,13 @@ Quand un utilisateur uploade un document, voici ce qui se passe dans l'ordre :
 
 ```
 1. L'utilisateur uploade un fichier (PDF, DOCX, TXT, PPTX…)
-   via POST /api/documents/upload (multipart/form-data)
+   via POST /api/workspaces/{workspaceId}/documents (multipart/form-data)
 
 2. Spring Boot reçoit le fichier avec le workspace_id du client (via JWT Keycloak)
 
 3. Le fichier est sauvegardé sur disque dans /documents/uploads/{workspace_id}/{document_id}.{ext}
 
-4. Une entrée DocumentEntity est créée en base PostgreSQL (status: PENDING)
+4. Une entité Document est créée en base PostgreSQL (status: PENDING)
 
 5. Un message JMS est publié dans la queue ActiveMQ "document-ingestion"
    → Le contrôleur retourne immédiatement l'ID du document au client
@@ -181,11 +181,11 @@ Quand un utilisateur uploade un document, voici ce qui se passe dans l'ordre :
        → Payload obligatoire : workspace_id (isolation multi-workspace)
        → Payload : document_id, filename, chunk_index, texte original
 
-7. IngestionJmsListener publie le résultat dans la queue "document-status"
-   → IngestionResultJmsListener (dans le backend API) consomme le message
-      et met à jour le statut en base : PENDING → INDEXED (ou ERROR)
-   → Le frontend suit la progression par polling GET /api/documents/{id}
-      toutes les 5 secondes tant qu'un document est en PENDING
+7. DocumentIngestionJmsListener met à jour le statut en base : PENDING → INDEXED
+   → Si toutes les tentatives échouent, le message arrive dans la DLQ
+      et le listener passe le document en ERROR
+   → Le frontend recharge la liste paginée des documents toutes les 5 secondes
+      tant qu'un document de la page est en PENDING
 ```
 
 ---
@@ -203,7 +203,7 @@ Quand un utilisateur pose une question, voici ce qui se passe dans l'ordre :
 
 4. Ce vecteur est envoyé à Qdrant pour chercher les n fiches les plus proches
    → Filtre obligatoire : workspace_id = ce_client OU source = "shared" (corpus Légifrance)
-   → Recherche hybride : par sens (dense) + par mots expansés (SPLADE)
+   → Recherche hybride : par sens (dense) + par mots-clés (sparse, poids lexicaux BGE-M3)
 
 5. Les n fiches les plus pertinentes sont sélectionnées
 
@@ -221,7 +221,7 @@ Quand un utilisateur pose une question, voici ce qui se passe dans l'ordre :
 ## Structure du projet
 
 ```
-rag-platform/
+rag-muffin/
 ├── CLAUDE.md                        ← ce fichier
 ├── docker-compose-dev.yml           ← stack de dev (services Docker)
 ├── backend/                         ← Projet Spring Boot 4
@@ -246,8 +246,8 @@ Chaque client a un `workspace_id` unique (UUID). Ce workspace_id est présent :
   `workspace_id`.
 - **Autorisation** : table `users` en base PostgreSQL. Associe un `user_id` (= `sub` du JWT) à un ou plusieurs
   `workspace_id` avec un rôle, un prénom et un nom (propres à chaque workspace).
-- **AuthService** (`security/AuthService.java`) : extrait le `userId` (UUID) depuis le `sub` du JWT. Plus de
-  `getWorkspaceId()` — le workspace est résolu via la table `users`.
+- **SecurityService** (`infra/security/SecurityService.java`) : s'appuie sur `JwtService` pour extraire l'identifiant
+  IdP (UUID) depuis le `sub` du JWT. Le workspace et le rôle sont résolus via la table `users`.
 
 ### Rôles par workspace
 
@@ -286,7 +286,7 @@ pointant vers une IP interne passe. Un LLM auto-hébergé sur IP privée (vLLM) 
 ### Backend (Java)
 
 - Java 25 avec Virtual Threads activés
-- Spring Boot 4.0.3
+- Spring Boot 4.0.5
 - Records Java pour les DTOs, Lombok pour les entities JPA et le logging (@Slf4j), MapStruct pour le mapping entité →
   DTO
 - Mappers MapStruct avec pattern `INSTANCE` statique (`Mappers.getMapper(...)`, pas de `componentModel = "spring"`) —
@@ -323,9 +323,10 @@ pointant vers une IP interne passe. Un LLM auto-hébergé sur IP privée (vLLM) 
 - Pas d'exceptions checked custom — utiliser `ResponseStatusException` de Spring
 - Organisation des services dans chaque module :
     - `service/` : services de logique métier (classes concrètes, pas d'interface si une seule implémentation)
-    - `service/external/` : services délégués à des systèmes externes (filesystem, broker JMS, Qdrant…).
-      Ceux-ci utilisent une **interface** avec deux implémentations : `XxxServiceImpl` (`@Profile("!test")`) pour
-      dev/prod
+    - `service/tool/` : outils propres à un module (stockage de fichiers, publication JMS, chunking…)
+    - `infra/<service>/` : clients des systèmes externes partagés (Qdrant, LLM, Tika, Keycloak…)
+    - Tout ce qui délègue à un système externe utilise une **interface** avec deux implémentations :
+      `XxxServiceImpl` (`@Profile("!test")`) pour dev/prod
       et `XxxServiceMock` (`@Profile("test")`) qui retourne des réponses vides.
       Pas de `@ConditionalOnProperty` ni `@ConditionalOnBean` (ce dernier est réservé aux auto-configurations Spring
       Boot)
@@ -461,7 +462,7 @@ suivante sans avoir validé la précédente.
   🎯 Validé quand : Traefik démarre et le dashboard est accessible (temporairement)
 
 ÉTAPE 11.3 — Configurer le routage via labels Docker
-  - ancrage.fr → frontend:80 (Nginx servant les fichiers Vue.js buildés)
+  - ancrage.fr → frontend:80 (Nginx servant les fichiers Angular buildés)
   - api.ancrage.fr → backend:8080
   - auth.ancrage.fr → keycloak:8080
   - Middlewares : headers de sécurité (X-Content-Type-Options, X-Frame-Options, HSTS),
@@ -796,7 +797,7 @@ de profil.
 ```bash
 # ── DEV LOCAL ──
 
-# Lancer la stack de dev (télécharge ai/mistral-nemo automatiquement au premier lancement)
+# Lancer la stack de dev (le LLM tourne à part, via Docker Model Runner)
 docker compose -f docker-compose-dev.yml up -d
 
 # Lancer le backend Spring Boot (hors Docker)
@@ -870,13 +871,13 @@ SPRING_PROFILES_ACTIVE=prod docker compose --profile prod up -d
 8. **Ne pas envoyer de données nominatives à l'API LLM.** Pseudonymiser AVANT l'appel. Pour les professions
    réglementées (avocats, notaires, experts-comptables), c'est une obligation pénale.
 
-9. **Ne pas utiliser ddl-auto: update en production.** Passer à Flyway ou Liquibase avant le premier vrai client.
+9. **Ne pas utiliser ddl-auto: update en production.** Le schéma est géré uniquement par les migrations Liquibase.
 
 10. **Le premier lancement du serveur BGE-M3 prend 3-5 minutes** (téléchargement du modèle ~2 Go). La commande
     `docker model package` pour créer `llama3.2:16k` prend 5-15 minutes (réécriture du fichier GGUF). Ne pas croire que
     c'est planté.
 
-11. **Docker contourne UFW par défaut.** Appliquer le fix iptables documenté dans la phase 9, sinon les ports Docker
+11. **Docker contourne UFW par défaut.** Appliquer le fix iptables prévu à l'étape 11.4, sinon les ports Docker
     sont ouverts au monde entier malgré le firewall.
 
 12. **Le frontend Angular tourne EN DEHORS de Docker en dev.** Avec `ng serve` directement sur ta machine, pas dans un

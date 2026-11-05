@@ -5,7 +5,7 @@ description: Vérifie tous les points d'attention sur l'ensemble du code existan
 
 Analyse l'ensemble du code source du projet et vérifie systématiquement les points d'attention suivants :
 
-1. Liste tous les fichiers de code du projet (Java, Vue/TypeScript, YAML, SQL, Dockerfile, docker-compose) en excluant :
+1. Liste tous les fichiers de code du projet (Java, TypeScript/Angular, YAML, SQL, Dockerfile, docker-compose) en excluant :
    - les fichiers générés
    - les fichiers exclus par .gitignore
    - les fichiers dans les répertoires cachés comme : .mvn
@@ -28,7 +28,7 @@ Analyse l'ensemble du code source du projet et vérifie systématiquement les po
 - Risques de fuite de données entre workspaces
 
 ## Conventions du projet (CLAUDE.md)
-- Respect du style de code (Google Java Format, Composition API, TypeScript)
+- Respect du style de code (Google Java Format, standalone components et signals Angular, TypeScript strict)
 - Optional plutôt que null
 - Cohérence des noms de fichiers et packages
 
