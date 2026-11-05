@@ -275,6 +275,10 @@ d'une verticale.
 clé de la plateforme n'est copiée dans les workspaces par `WorkspaceMapper`, donc aucune n'est exposée par le `baseUrl`
 librement choisi par l'OWNER. Ce n'est pas une faille, tant que cette règle est respectée.
 
+Le `baseUrl` est contrôlé par la regex `app.llm-url.allowed-pattern` (protection SSRF) : en prod, uniquement `https` vers
+un nom de domaine ; le dev autorise `http` et localhost. Limite connue, acceptée : sans résolution DNS, un domaine
+pointant vers une IP interne passe. Un LLM auto-hébergé sur IP privée (vLLM) demandera d'adapter cette regex.
+
 ---
 
 ## Conventions de code

@@ -3,6 +3,7 @@ package fr.drjeanjean.ragmuffin.workspace.service;
 import fr.drjeanjean.ragmuffin.document.service.DocumentService;
 import fr.drjeanjean.ragmuffin.llmconfig.dto.UpdateLlmConfigRequest;
 import fr.drjeanjean.ragmuffin.llmconfig.properties.DefaultLlmConfigProperties;
+import fr.drjeanjean.ragmuffin.llmconfig.properties.LlmUrlProperties;
 import fr.drjeanjean.ragmuffin.user.service.UserService;
 import fr.drjeanjean.ragmuffin.vertical.VerticalRepository;
 import fr.drjeanjean.ragmuffin.workspace.Workspace;
@@ -32,6 +33,7 @@ public class WorkspaceService {
     private final UserService userService;
     private final DocumentService documentService;
     private final DefaultLlmConfigProperties defaultLlmConfigProperties;
+    private final LlmUrlProperties llmUrlProperties;
 
     public Workspace create(CreateWorkspaceWithOwnerRequest request) {
         var vertical = verticalRepository.getReferenceById(request.createWorkspaceRequest().verticalId());
@@ -61,6 +63,9 @@ public class WorkspaceService {
     }
 
     public void updateLlmConfig(Workspace workspace, UpdateLlmConfigRequest request) {
+        if (!request.baseUrl().matches(llmUrlProperties.allowedPattern())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "LLM base URL not allowed.");
+        }
         workspace.updateLlmConfig(request.baseUrl(), request.apiKey(), request.model());
         log.info("Updated LLM config for workspace {}", workspace.getId());
     }

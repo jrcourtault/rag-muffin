@@ -52,4 +52,6 @@ app:
     base-url: http://localhost:12434/engines/v1
     api-key:
     model: llama3.2:16k
+  llm-url:
+    allowed-pattern: '^https?://[^?#@\s]+$'
 

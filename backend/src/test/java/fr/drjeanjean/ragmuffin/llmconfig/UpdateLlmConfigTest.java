@@ -2,6 +2,8 @@ package fr.drjeanjean.ragmuffin.llmconfig;
 
 import fr.drjeanjean.ragmuffin.infra.config.TestcontainersConfig;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -62,13 +64,42 @@ class UpdateLlmConfigTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                  "baseUrl": "http://localhost:12434/engines/v1",
-                                  "model": "llama3.2:16k"
+                                  "baseUrl": "https://api.mistral.ai/v1",
+                                  "model": "mistral-small-latest"
                                 }
                                 """))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.baseUrl").value("http://localhost:12434/engines/v1"))
-                .andExpect(jsonPath("$.model").value("llama3.2:16k"));
+                .andExpect(jsonPath("$.baseUrl").value("https://api.mistral.ai/v1"))
+                .andExpect(jsonPath("$.model").value("mistral-small-latest"));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "http://api.mistral.ai/v1",
+            "ftp://api.mistral.ai/v1",
+            "https://localhost:6333/v1",
+            "https://qdrant:6333/v1",
+            "https://10.0.0.1/v1",
+            "https://169.254.169.254/v1",
+            "https://2130706433/v1",
+            "https://[::1]/v1",
+            "https://user@api.mistral.ai/v1",
+            "https://api.mistral.ai@10.0.0.1/v1",
+            "https://api.mistral.ai/v1?x=",
+            "https://api.mistral.ai/v1#x"
+    })
+    @Sql(scripts = {"/sql/clean.sql", "/sql/workspaces.sql", "/sql/users.sql"})
+    void shouldReturn400_whenBaseUrlNotAllowed(String baseUrl) throws Exception {
+        mockMvc.perform(put("/api/workspaces/{workspaceId}/llm-config", WORKSPACE_ID)
+                        .with(jwt(OWNER_ID))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "baseUrl": "%s",
+                                  "model": "mistral-small-latest"
+                                }
+                                """.formatted(baseUrl)))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
