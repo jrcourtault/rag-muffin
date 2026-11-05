@@ -119,11 +119,11 @@ public class Workspace {
 
     /**
      * Update the LLM config of the workspace
-     * @param apiKey - null or blank means "not change the apiKey config"
+     * @param apiKey - null or blank removes the key: a stored key must never follow a new baseUrl
      */
     public void updateLlmConfig(String baseUrl, String apiKey, String model) {
         this.llmBaseUrl = baseUrl;
-        this.llmApiKey = (apiKey != null && !apiKey.isBlank()) ? apiKey : this.llmApiKey;
+        this.llmApiKey = (apiKey != null && !apiKey.isBlank()) ? apiKey : null;
         this.llmModel = model;
     }
 }

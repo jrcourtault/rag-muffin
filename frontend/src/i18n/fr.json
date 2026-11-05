@@ -119,7 +119,7 @@
   "llmConfig.title": "Configuration LLM",
   "llmConfig.baseUrl": "URL de base (OpenAI-compatible)",
   "llmConfig.apiKey": "Clé API",
-  "llmConfig.apiKeyPlaceholder": "Laisser vide pour conserver la clé existante",
-  "llmConfig.apiKeyHint": "Une clé API est déjà configurée. Laisser vide pour la conserver.",
+  "llmConfig.apiKeyPlaceholder": "Laisser vide pour supprimer la clé",
+  "llmConfig.apiKeyHint": "Une clé API est configurée. Ressaisissez-la à chaque enregistrement : laisser ce champ vide la supprime.",
   "llmConfig.model": "Modèle"
 }

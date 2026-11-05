@@ -119,7 +119,7 @@
   "llmConfig.title": "LLM Configuration",
   "llmConfig.baseUrl": "Base URL (OpenAI-compatible)",
   "llmConfig.apiKey": "API Key",
-  "llmConfig.apiKeyPlaceholder": "Leave blank to keep existing key",
-  "llmConfig.apiKeyHint": "An API key is already configured. Leave blank to keep it.",
+  "llmConfig.apiKeyPlaceholder": "Leave blank to remove the key",
+  "llmConfig.apiKeyHint": "An API key is configured. Re-enter it on every save: leaving this field blank removes it.",
   "llmConfig.model": "Model"
 }
