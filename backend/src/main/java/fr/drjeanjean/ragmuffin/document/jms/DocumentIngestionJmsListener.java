@@ -73,11 +73,14 @@ public class DocumentIngestionJmsListener {
         qdrantService.store(chunks, chunkEmbeddings);
         log.info("Document {} : {} embedded chunks stored in Qdrant", documentId, chunks.size());
 
-        documentRepository.findById(documentId).ifPresent(document -> {
+        documentRepository.findById(documentId).ifPresentOrElse(document -> {
             document.markIndexed(chunks.size());
             documentRepository.save(document);
+            log.info("Document {} indexed successfully", documentId);
+        }, () -> {
+            log.warn("Document {} no longer exists: removing its vectors", documentId);
+            qdrantService.deleteByDocumentId(documentId);
         });
-        log.info("Document {} indexed successfully", documentId);
     }
 
     @JmsListener(destination = "DLQ", selector = "_AMQ_ORIG_ADDRESS = 'document-ingestion'")

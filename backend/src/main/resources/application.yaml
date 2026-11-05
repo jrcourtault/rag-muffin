@@ -21,6 +21,10 @@ spring:
         max-page-size: 100
   liquibase:
     change-log: classpath:/db/changelog/db.changelog-master.yaml
+  jms:
+    template:
+      session:
+        transacted: true # Le message JMS part au commit de la transaction en base, et il est annulé en cas de rollback
 
 app:
   cleanup:
