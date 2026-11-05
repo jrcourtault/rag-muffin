@@ -5,9 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
+import java.net.http.HttpClient;
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -17,13 +20,21 @@ import java.util.UUID;
 @Profile("!test")
 public class IdpServiceImpl implements IdpService {
 
+    private static final Duration CONNECT_TIMEOUT = Duration.ofSeconds(5);
+
     private final RestClient restClient;
     private final KeycloakProperties properties;
 
     public IdpServiceImpl(KeycloakProperties properties) {
         this.properties = properties;
+        var httpClient = HttpClient.newBuilder()
+                .connectTimeout(CONNECT_TIMEOUT)
+                .build();
+        var requestFactory = new JdkClientHttpRequestFactory(httpClient);
+        requestFactory.setReadTimeout(properties.timeout());
         this.restClient = RestClient.builder()
                 .baseUrl(properties.baseUrl())
+                .requestFactory(requestFactory)
                 .build();
     }
 

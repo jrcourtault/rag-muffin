@@ -46,6 +46,10 @@ app:
     timeout: 2m
   llm:
     timeout: 2m # par appel : une question avec reformulation fait deux appels
+  reranker:
+    timeout: 1m # le cross-encoder peut être lent sur CPU quand il y a beaucoup de candidats
+  keycloak:
+    timeout: 30s # par appel : l'envoi de l'email de vérification passe par le SMTP de Keycloak
   llm-url:
     # https + nom de domaine : refuse les IP, localhost et les noms internes (protection SSRF)
     allowed-pattern: '^https://([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(:\d+)?(/[^?#\s]*)?$'

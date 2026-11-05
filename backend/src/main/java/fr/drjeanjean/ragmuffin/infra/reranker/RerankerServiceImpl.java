@@ -6,9 +6,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
+import java.net.http.HttpClient;
+import java.time.Duration;
 import java.util.Comparator;
 import java.util.List;
 
@@ -17,11 +20,19 @@ import java.util.List;
 @Profile("!test")
 public class RerankerServiceImpl implements RerankerService {
 
+    private static final Duration CONNECT_TIMEOUT = Duration.ofSeconds(5);
+
     private final RestClient client;
 
     public RerankerServiceImpl(RerankerProperties properties) {
+        var httpClient = HttpClient.newBuilder()
+                .connectTimeout(CONNECT_TIMEOUT)
+                .build();
+        var requestFactory = new JdkClientHttpRequestFactory(httpClient);
+        requestFactory.setReadTimeout(properties.timeout());
         this.client = RestClient.builder()
                 .baseUrl(properties.baseUrl())
+                .requestFactory(requestFactory)
                 .build();
     }
 
