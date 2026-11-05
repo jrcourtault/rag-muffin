@@ -107,8 +107,8 @@ Spring Boot 4 (REST API)
 | Reranker         | BGE-Reranker-v2-M3 via HuggingFace TEI              |
 | Relational DB    | PostgreSQL 18                                       |
 | Message broker   | ActiveMQ Artemis                                    |
-| Document parsing | Apache Tika 2.x                                     |
-| Auth             | Keycloak 26 (prod) / JWT HS256 (dev)                |
+| Document parsing | Apache Tika Server 3.x                              |
+| Auth             | Keycloak 26                                         |
 | LLM (dev)        | Docker Model Runner + Llama 3.2 3B (`llama3.2:16k`) |
 | LLM (prod)       | Configurable per workspace                          |
 | Reverse proxy    | Traefik 3 (prod)                                    |

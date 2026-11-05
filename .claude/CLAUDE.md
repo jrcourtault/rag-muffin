@@ -35,7 +35,7 @@ entre tous les clients d'une même verticale.
 | LLM (production)     | **Mistral Small 3.2** via API Mistral (`mistral-small-24b-instruct-2506`)            | Hébergé en Europe, RGPD natif, 128k contexte, multimodal, Apache 2.0                         |
 | LLM (futur)          | **vLLM** + Mistral Small 3.2 local (`mistralai/Mistral-Small-3.2-24B-Instruct-2506`) | Quand le volume justifie un serveur GPU dédié                                                |
 | File d'attente       | **ActiveMQ Artemis**                                                                 | Broker JMS embarqué dans Spring Boot ou conteneur Docker, file d'attente ingestion           |
-| Extraction documents | **Apache Tika 2.x**                                                                  | Java natif, 1000+ formats supportés                                                          |
+| Extraction documents | **Apache Tika Server 3.x**                                                            | Service HTTP séparé, 1000+ formats supportés                                                 |
 | OCR                  | **Tesseract 5**                                                                      | Gratuit, CPU-only, suffisant pour les scans propres                                          |
 | Auth                 | **Keycloak 26**                                                                      | OAuth2/OIDC, multi-workspace via Realms, gratuit                                             |
 | Frontend             | **Angular 21** + **PrimeNG**                                                         | Framework structuré, familiarité développeur, écosystème mature                              |
@@ -111,7 +111,7 @@ localhost (Mac M3 ou PC RTX 3070)
    └── http://localhost:6333/dashboard  → dashboard Qdrant (debug)
 ```
 
-En dev : pas de Traefik, pas de Keycloak, pas de HTTPS. Le frontend Angular tourne **en dehors de Docker**
+En dev : pas de Traefik, pas de HTTPS, mais Keycloak tourne dans Docker. Le frontend Angular tourne **en dehors de Docker**
 avec `ng serve` (hot reload instantané). Le reste tourne dans Docker, y compris le LLM via Docker Model Runner.
 
 ### Schéma de l'architecture production (OVH VPS-6)
@@ -242,7 +242,7 @@ Chaque client a un `workspace_id` unique (UUID). Ce workspace_id est présent :
 
 ### Architecture auth vs authz (séparation authentification / autorisation)
 
-- **Authentification** : Keycloak (ou JWT HS256 en dev). Le JWT contient un `sub` (UUID utilisateur Keycloak), pas de
+- **Authentification** : Keycloak, en dev comme en prod. Le JWT contient un `sub` (UUID utilisateur Keycloak), pas de
   `workspace_id`.
 - **Autorisation** : table `users` en base PostgreSQL. Associe un `user_id` (= `sub` du JWT) à un ou plusieurs
   `workspace_id` avec un rôle, un prénom et un nom (propres à chaque workspace).
@@ -379,7 +379,7 @@ pointant vers une IP interne passe. Un LLM auto-hébergé sur IP privée (vLLM) 
 
 ```env
 # ── Profil Spring ──
-# dev  = Docker Model Runner local, pas de Keycloak, pas de HTTPS
+# dev  = Docker Model Runner local, Keycloak local, pas de HTTPS
 # prod = API Mistral, Keycloak, Traefik HTTPS
 SPRING_PROFILES_ACTIVE=dev
 
@@ -845,8 +845,8 @@ SPRING_PROFILES_ACTIVE=prod docker compose --profile prod up -d
 
 ## Pièges à éviter
 
-1. **Ne pas ajouter Keycloak trop tôt.** L'auth complique le développement. D'abord valider le pipeline RAG avec un
-   simple workspaceId dans l'URL, puis ajouter Keycloak en phase 8.
+1. **Keycloak est requis aussi en dev.** Le backend valide les JWT auprès du Keycloak lancé par
+   `docker-compose-dev.yml` : sans lui, les appels à l'API échouent.
 
 2. **Ne pas exposer les ports Docker directement en prod.** Tout passe par Traefik. Les bases de données ne doivent
    JAMAIS être accessibles depuis Internet.

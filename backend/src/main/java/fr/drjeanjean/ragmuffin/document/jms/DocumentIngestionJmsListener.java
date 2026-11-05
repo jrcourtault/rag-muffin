@@ -54,7 +54,7 @@ public class DocumentIngestionJmsListener {
 
         var text = tikaService.extract(filePath);
         if (text.isEmpty()) {
-            throw new RuntimeException("No text extracted from " + fileName + " — Tesseract may not be installed (required for scanned PDFs)");
+            throw new RuntimeException("No text extracted from " + fileName + " — empty document, or OCR found no text");
         }
         log.info("Document {} : {} characters extracted from {}", documentId, text.length(), fileName);
 
