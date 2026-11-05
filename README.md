@@ -50,7 +50,7 @@ New verticals can be created by a super-admin, with custom prompts and RAG setti
 - **Multi-tenant** — each client gets an isolated workspace; Qdrant payload filtering enforces strict data separation at
   the vector level
 - **Multi-vertical** — pluggable business domains (legal, accounting…), each with dedicated default prompts
-  and RAG settings; shared public corpora (regulations, standards) are served across all workspaces of a vertical
+  and RAG settings
 - **Async ingestion pipeline** — upload returns immediately; processing (extraction → chunking → embedding → indexing)
   happens in the background via ActiveMQ
 - **Multi-format support** — PDFs, Word, PowerPoint, plain text, and more via Apache Tika
@@ -142,6 +142,12 @@ production.
 
 Once the dev setup is complete, open [http://localhost:4200](http://localhost:4200) and log in with the seeded admin
 account: `admin@rag-muffin.fr` / `admin` (see [INSTALL-dev.md](INSTALL-dev.md#first-admin-user)).
+
+---
+
+## Roadmap
+
+- **Shared public corpora** — regulations and standards served across all workspaces of a vertical
 
 ---
 
