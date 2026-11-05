@@ -9,6 +9,9 @@ import fr.drjeanjean.ragmuffin.infra.qdrant.properties.QdrantProperties;
 import io.qdrant.client.QdrantClient;
 import io.qdrant.client.grpc.Collections.CreateCollection;
 import io.qdrant.client.grpc.Collections.Distance;
+import io.qdrant.client.grpc.Collections.KeywordIndexParams;
+import io.qdrant.client.grpc.Collections.PayloadIndexParams;
+import io.qdrant.client.grpc.Collections.PayloadSchemaType;
 import io.qdrant.client.grpc.Collections.SparseVectorConfig;
 import io.qdrant.client.grpc.Collections.SparseVectorParams;
 import io.qdrant.client.grpc.Collections.VectorParams;
@@ -54,8 +57,13 @@ public class QdrantServiceImpl implements QdrantService {
     private final QdrantProperties qdrantProperties;
 
     @PostConstruct
+    void initCollection() {
+        ensureCollectionExists();
+        ensurePayloadIndexes();
+    }
+
     @SneakyThrows
-    void ensureCollectionExists() {
+    private void ensureCollectionExists() {
         var collections = qdrantClient.listCollectionsAsync().get();
         if (collections.contains(qdrantProperties.collectionName())) {
             log.info("Qdrant collection '{}' already exists", qdrantProperties.collectionName());
@@ -86,6 +94,25 @@ public class QdrantServiceImpl implements QdrantService {
                         .build()
         ).get();
         log.info("Qdrant collection '{}' created", qdrantProperties.collectionName());
+    }
+
+    /**
+     * Crée les index de payload. Exécuté à chaque démarrage pour couvrir aussi une collection déjà existante.
+     * {@code is_tenant} indique à Qdrant que {@code workspace_id} sépare des clients : il optimise le stockage
+     * et les recherches filtrées sur ce champ.
+     */
+    @SneakyThrows
+    private void ensurePayloadIndexes() {
+        var collectionName = qdrantProperties.collectionName();
+        var tenantIndexParams = PayloadIndexParams.newBuilder()
+                .setKeywordIndexParams(KeywordIndexParams.newBuilder().setIsTenant(true).build())
+                .build();
+
+        qdrantClient.createPayloadIndexAsync(collectionName, "workspace_id", PayloadSchemaType.Keyword,
+                tenantIndexParams, true, null, null).get();
+        qdrantClient.createPayloadIndexAsync(collectionName, "document_id", PayloadSchemaType.Keyword,
+                null, true, null, null).get();
+        log.info("Qdrant payload indexes ensured on collection '{}'", collectionName);
     }
 
     @Override

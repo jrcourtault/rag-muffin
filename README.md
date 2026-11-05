@@ -148,6 +148,8 @@ account: `admin@rag-muffin.fr` / `admin` (see [INSTALL-dev.md](INSTALL-dev.md#fi
 ## Roadmap
 
 - **Shared public corpora** — regulations and standards served across all workspaces of a vertical
+- **PostgreSQL Row-Level Security** — database-level workspace isolation, in addition to the application checks
+- **Workspace-aware logging** — `workspace_id` in every log line through SLF4J MDC
 
 ---
 

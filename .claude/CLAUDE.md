@@ -27,7 +27,7 @@ entre tous les clients d'une même verticale.
 | Backend API          | **Spring Boot 4** (Java 25)                                                          | Virtual Threads, écosystème mature                                                           |
 | Appels LLM           | **RestClient** (Spring) → API OpenAI-compatible                                      | Appels HTTP directs, contrôle total, pas de framework IA                                     |
 | Appels Embeddings    | **RestClient** (Spring) → serveur BGE-M3 FastAPI                                     | Appels HTTP directs, pas de dépendance framework                                             |
-| Base relationnelle   | **PostgreSQL 18**                                                                    | Métadonnées, workspaces, audit. Row-Level Security pour l'isolation                          |
+| Base relationnelle   | **PostgreSQL 18**                                                                    | Métadonnées, workspaces, audit                                                               |
 | Base vectorielle     | **Qdrant 1.17** via **QdrantClient** gRPC natif                                      | Recherche hybride native (dense + sparse BGE-M3), multi-workspace par payload, écrit en Rust |
 | Embeddings           | **BGE-M3** via **FastAPI** + **FlagEmbedding**                                       | Dense 1024 dims + sparse (lexical weights) depuis un seul modèle, français excellent         |
 | Reranker             | **BGE-Reranker-v2-M3** via **TEI** (HuggingFace Text Embeddings Inference)           | Cross-encoder multilingue, même famille BGE-M3, ~+12 pts de précision vs hybride seul        |
@@ -237,9 +237,8 @@ rag-platform/
 
 Chaque client a un `workspace_id` unique (UUID). Ce workspace_id est présent :
 
-- Dans chaque table PostgreSQL (colonne `workspace_id` + Row-Level Security)
+- Dans chaque table PostgreSQL (colonne `workspace_id`)
 - Dans chaque vecteur Qdrant (payload `workspace_id` indexé)
-- Dans chaque log applicatif (MDC SLF4J)
 
 ### Architecture auth vs authz (séparation authentification / autorisation)
 
@@ -303,7 +302,7 @@ pointant vers une IP interne passe. Un LLM auto-hébergé sur IP privée (vLLM) 
 - Entités JPA immutables par défaut : `@Getter` + `@NoArgsConstructor(access = PROTECTED)` + `@Builder` sur un
   constructeur privé (pas de `@Setter`). Mutations via des méthodes de domaine explicites.
 - `Optional` plutôt que `null`
-- Logging via SLF4J avec MDC pour le workspace_id
+- Logging via SLF4J (MDC pour le workspace_id : voir étape 14.3)
 - Tests : JUnit 5 + Testcontainers PostgreSQL (tous les tests tournent contre un vrai PostgreSQL via Testcontainers)
 - Approche **database-first** : le schéma SQL est la source de vérité. On écrit d'abord la migration Liquibase, puis
   l'entité JPA qui se valide contre le schéma. `ddl-auto: validate` uniquement (jamais `update` ou `create`). Migrations
@@ -542,6 +541,20 @@ suivante sans avoir validé la précédente.
 ÉTAPE 14.1 — Chiffrer les API key des LLM
 - Ne pas stocker les API key des LLM en clair
   🎯 Validé quand : les API key des LLM ne sont pas stockées en clair
+
+ÉTAPE 14.2 — Row-Level Security PostgreSQL
+- Ajouter des policies RLS sur les tables portant un workspace_id (documents, users)
+- Positionner le workspace par transaction (SET LOCAL), à cause du pool de connexions
+- Utiliser un compte DB dédié, sans droit superutilisateur (un superutilisateur ignore la RLS)
+- Prévoir les accès hors contexte de requête : listener JMS, job de nettoyage, écrans ADMIN
+- À faire avant d'ouvrir la verticale juridique
+  🎯 Validé quand : une requête SQL sans workspace positionné ne retourne aucune ligne
+
+ÉTAPE 14.3 — workspace_id dans les logs (MDC SLF4J)
+- HandlerInterceptor qui place le workspaceId dans le MDC et le retire en fin de requête
+- Même traitement au début du listener JMS, qui ne passe pas par HTTP
+- Ajouter %X{workspace_id} au format des logs
+  🎯 Validé quand : chaque ligne de log liée à un workspace affiche son workspace_id
 ```
 
 
