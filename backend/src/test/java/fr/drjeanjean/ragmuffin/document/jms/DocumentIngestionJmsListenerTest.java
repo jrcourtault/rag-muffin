@@ -124,13 +124,14 @@ class DocumentIngestionJmsListenerTest {
     }
 
     @Test
-    void shouldMarkError_whenMessageReachesDlq() {
+    void shouldMarkErrorAndRemoveVectors_whenMessageReachesDlq() {
         when(documentRepository.findById(DOCUMENT_ID)).thenReturn(Optional.of(document));
 
         listener.onDlq(MESSAGE);
 
         assertThat(document.getStatus()).isEqualTo(DocumentStatus.ERROR);
         verify(documentRepository).save(document);
+        verify(qdrantService).deleteByDocumentId(DOCUMENT_ID);
     }
 
     private void givenWorkspaceWithChunking() {

@@ -30,6 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -135,7 +136,7 @@ public class QdrantServiceImpl implements QdrantService {
             var sparse = emb.sparse();
 
             var point = PointStruct.newBuilder()
-                    .setId(id(UUID.randomUUID()))
+                    .setId(id(pointId(chunk)))
                     .setVectors(
                             namedVectors(Map.of(
                                     DENSE_VECTOR_NAME, vector(toFloatList(dense.vector())),
@@ -153,6 +154,11 @@ public class QdrantServiceImpl implements QdrantService {
         }
 
         qdrantClient.upsertAsync(qdrantProperties.collectionName(), points).get();
+    }
+
+    private static UUID pointId(Chunk chunk) {
+        var key = chunk.documentId() + ":" + chunk.chunkIndex();
+        return UUID.nameUUIDFromBytes(key.getBytes(StandardCharsets.UTF_8));
     }
 
     @Override

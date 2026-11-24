@@ -92,6 +92,7 @@ public class DocumentIngestionJmsListener {
     public void onDlq(String json) {
         var message = jsonMapper.readValue(json, IngestionJmsMessage.class);
         log.error("Ingestion definitively failed for document {} after all retries", message.documentId());
+        qdrantService.deleteByDocumentId(message.documentId());
         markError(message.documentId());
     }
 

@@ -3,6 +3,7 @@ package fr.drjeanjean.ragmuffin.document.service;
 import fr.drjeanjean.ragmuffin.document.DocumentRepository;
 import fr.drjeanjean.ragmuffin.document.DocumentStatus;
 import fr.drjeanjean.ragmuffin.document.service.tool.FileStorageService;
+import fr.drjeanjean.ragmuffin.infra.qdrant.QdrantService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
@@ -20,6 +21,7 @@ public class DocumentCleanupJob {
 
     private final DocumentRepository documentRepository;
     private final FileStorageService fileStorageService;
+    private final QdrantService qdrantService;
     private final CleanupProperties cleanupProperties;
 
     @Scheduled(cron = "${app.cleanup.cron}")
@@ -31,6 +33,7 @@ public class DocumentCleanupJob {
 
         if (docs.isEmpty()) return;
 
+        docs.forEach(doc -> qdrantService.deleteByDocumentId(doc.getId()));
         documentRepository.deleteAllInBatch(docs);
         docs.forEach(doc -> fileStorageService.delete(doc.getWorkspace().getId(), doc.getId(), doc.getExtension()));
         log.info("Cleanup : {} document(s) en erreur supprimés (rétention {} j)", docs.size(), cleanupProperties.errorRetentionDays());

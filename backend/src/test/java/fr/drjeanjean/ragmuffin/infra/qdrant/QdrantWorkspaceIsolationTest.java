@@ -111,6 +111,17 @@ class QdrantWorkspaceIsolationTest {
     }
 
     @Test
+    void shouldOverwriteChunks_whenDocumentIsStoredAgain() {
+        var workspace = UUID.randomUUID();
+        var document = store(workspace, "rejoue.pdf");
+
+        store(workspace, document, "rejoue.pdf");
+
+        assertThat(search(workspace)).singleElement()
+                .satisfies(chunk -> assertThat(chunk.documentId()).isEqualTo(document));
+    }
+
+    @Test
     void shouldRenameChunks_ofGivenDocument() {
         var workspace = UUID.randomUUID();
         var document = store(workspace, "ancien-nom.pdf");
@@ -139,7 +150,10 @@ class QdrantWorkspaceIsolationTest {
     }
 
     private static UUID store(UUID workspaceId, String fileName) {
-        var documentId = UUID.randomUUID();
+        return store(workspaceId, UUID.randomUUID(), fileName);
+    }
+
+    private static UUID store(UUID workspaceId, UUID documentId, String fileName) {
         var chunk = new Chunk("Le bailleur doit réparer", workspaceId, documentId, fileName, 0);
         qdrantService.store(List.of(chunk), List.of(new ChunkEmbeddings(DENSE, SPARSE)));
         return documentId;
