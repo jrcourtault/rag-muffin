@@ -184,6 +184,8 @@ Quand un utilisateur uploade un document, voici ce qui se passe dans l'ordre :
 7. DocumentIngestionJmsListener met à jour le statut en base : PENDING → INDEXED
    → Si toutes les tentatives échouent, le message arrive dans la DLQ
       et le listener passe le document en ERROR
+   → Si le message est perdu (le broker échoue au moment du commit), DocumentCleanupJob
+      passe en ERROR les documents encore PENDING après app.cleanup.pending-timeout (6h)
    → Le frontend recharge la liste paginée des documents toutes les 5 secondes
       tant qu'un document de la page est en PENDING
 ```

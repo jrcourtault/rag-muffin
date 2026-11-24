@@ -30,6 +30,8 @@ app:
   cleanup:
     cron: "0 0 2 * * *"
     error-retention-days: 7
+    pending-timeout: 6h
+    pending-cron: "0 */15 * * * *"
   upload:
     # PDF : pdf
     # Texte : txt, md, csv, tsv, rtf, html, htm, xml, json, yaml, yml, log

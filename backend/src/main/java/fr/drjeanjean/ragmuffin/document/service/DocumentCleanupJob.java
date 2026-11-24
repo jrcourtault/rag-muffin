@@ -35,4 +35,16 @@ public class DocumentCleanupJob {
         docs.forEach(doc -> fileStorageService.delete(doc.getWorkspace().getId(), doc.getId(), doc.getExtension()));
         log.info("Cleanup : {} document(s) en erreur supprimés (rétention {} j)", docs.size(), cleanupProperties.errorRetentionDays());
     }
+
+    @Scheduled(cron = "${app.cleanup.pending-cron}")
+    @Transactional(rollbackFor = Exception.class)
+    public void markStalePendingDocumentsAsError() {
+        var now = OffsetDateTime.now();
+        var cutoff = now.minus(cleanupProperties.pendingTimeout());
+        var count = documentRepository.markPendingAsErrorCreatedBefore(cutoff, now);
+        if (count > 0) {
+            log.warn("{} document(s) stuck in PENDING for more than {} marked as ERROR",
+                    count, cleanupProperties.pendingTimeout());
+        }
+    }
 }
